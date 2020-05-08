@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "classnames": "2.2.6",
+    "contentful": "^7.14.4",
+    "contentful-management": "^5.26.1",
     "date-fns": "2.10.0",
     "gray-matter": "4.0.2",
     "isomorphic-unfetch": "3.0.0",
@@ -17,11 +19,11 @@
     "remark": "11.0.2",
     "remark-html": "10.0.0",
     "styled-components": "^5.1.0",
-    "tinacms": "^0.19.0"
+    "tinacms": "^0.19.0",
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^2.1.0",
-    "dotenv": "8.2.0",
     "postcss-preset-env": "^6.7.0",
     "tailwindcss": "^1.2.0"
   }
