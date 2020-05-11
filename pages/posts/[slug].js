@@ -22,7 +22,10 @@ const client = require("contentful").createClient({
 export default function Post({ post: initialPost, morePosts, preview }) {
   const router = useRouter();
   const cms = useCMS();
-  if (!router.isFallback && !initialPost?.slug) {
+
+  const locale = "en-US";
+
+  if (!router.isFallback && !initialPost?.fields.slug[locale]) {
     return <ErrorPage statusCode={404} />;
   }
 
@@ -32,17 +35,15 @@ export default function Post({ post: initialPost, morePosts, preview }) {
   const version = initialPost.sys.version;
 
   const formConfig = {
-    id: initialPost.slug,
+    id: initialPost.fields.slug[locale],
     label: "Blog Post",
-    initialValues: initialPost,
+    initialValues: initialPost.fields,
     onSubmit: (values) => {
-      cms.api.contentful.save(id, version, contentType, {
-        title: values.title,
-      });
+      cms.api.contentful.save(id, version, contentType, values);
     },
     fields: [
       {
-        name: "title",
+        name: "title." + locale,
         label: "Post Title",
         component: "text",
       },
@@ -75,15 +76,15 @@ export default function Post({ post: initialPost, morePosts, preview }) {
             <article className="mb-32">
               <Head>
                 <title>
-                  {post.title} | Next.js Blog Example with {CMS_NAME}
+                  {post.title[locale]} | Next.js Blog Example with {CMS_NAME}
                 </title>
                 <meta property="og:image" content={post.ogImage?.url || ""} />
               </Head>
               <PostHeader
-                title={post.title}
+                title={post.title[locale]}
                 coverImage={post.coverImage}
-                date={post.date}
-                author={post.author}
+                date={post.date[locale]}
+                author={post.author[locale]}
               />
               <PostBody content={htmlContent} />
             </article>
@@ -112,41 +113,33 @@ export async function getStaticProps({ params }) {
 
   const post = posts.items[0];
 
-  // const linkedPostData = (
-  //   await axios({
-  //     url:
-  //       `https://cdn.contentful.com/spaces/raftynxu3gyd/environments/master/entries/${post.sys.id}` +
-  //       `?access_token=${process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN}`,
-  //     method: "GET",
-  //   })
-  // ).data;
+  // TODO - these are the fields used by out layout
+  // We no longer an map them here, as we will want to save them all out
+  // in original format
 
-  const fields = {
-    title: post.fields.title["en-US"],
-    date: post.fields.publishDate["en-US"],
-    slug: post.fields.slug["en-US"],
-    author: {
-      name: "Johnny",
-      image: {
-        fields: {
-          file: { url: "" },
-        },
-      },
-    }, //linkedPostData.fields.author.fields,
-    coverImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
-    ogImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
-  };
+  // const fields = {
+  //   title: post.fields.title["en-US"],
+  //   date: post.fields.publishDate["en-US"],
+  //   slug: post.fields.slug["en-US"],
+  //   author: {
+  //     name: "Johnny",
+  //     image: {
+  //       fields: {
+  //         file: { url: "" },
+  //       },
+  //     },
+  //   }, //linkedPostData.fields.author.fields,
+  //   coverImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
+  //   ogImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
+  // };
 
   const content = await markdownToHtml(post.fields.body || "");
 
   return {
     props: {
-      post: {
-        ...fields,
-        content,
-        sys: post.sys,
-        rawMarkdownBody: post.fields.body["en-US"],
-      },
+      post,
+      content,
+      rawMarkdownBody: post.fields.body["en-US"],
     },
   };
 }
