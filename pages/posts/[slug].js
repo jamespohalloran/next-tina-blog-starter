@@ -10,7 +10,7 @@ import Head from "next/head";
 import { CMS_NAME } from "../../lib/constants";
 import markdownToHtml from "../../lib/markdownToHtml";
 import { useState, useEffect, useMemo } from "react";
-import { useForm, usePlugin } from "tinacms";
+import { useForm, usePlugin, useCMS } from "tinacms";
 
 const client = require("contentful").createClient({
   space: process.env.CONTENTFUL_SPACE_ID,
@@ -19,16 +19,19 @@ const client = require("contentful").createClient({
 
 export default function Post({ post: initialPost, morePosts, preview }) {
   const router = useRouter();
+  const cms = useCMS();
   if (!router.isFallback && !initialPost?.slug) {
     return <ErrorPage statusCode={404} />;
   }
+
+  console.log(initialPost);
 
   const formConfig = {
     id: initialPost.slug,
     label: "Blog Post",
     initialValues: initialPost,
-    onSubmit: (values) => {
-      alert(`Submitting ${values.title}`);
+    onSubmit: ({ id, ...values }) => {
+      cms.api.contentful.save(id, values);
     },
     fields: [
       {
