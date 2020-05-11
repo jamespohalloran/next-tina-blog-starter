@@ -12,6 +12,8 @@ import markdownToHtml from "../../lib/markdownToHtml";
 import { useState, useEffect, useMemo } from "react";
 import { useForm, usePlugin, useCMS } from "tinacms";
 
+const axios = require("axios");
+
 const client = require("contentful").createClient({
   space: process.env.CONTENTFUL_SPACE_ID,
   accessToken: process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN,
@@ -24,14 +26,19 @@ export default function Post({ post: initialPost, morePosts, preview }) {
     return <ErrorPage statusCode={404} />;
   }
 
-  console.log(initialPost);
+  const id = initialPost.sys.id;
+  const contentType = initialPost.sys.contentType.sys.id;
+
+  const version = initialPost.sys.version;
 
   const formConfig = {
     id: initialPost.slug,
     label: "Blog Post",
     initialValues: initialPost,
-    onSubmit: ({ id, ...values }) => {
-      cms.api.contentful.save(id, values);
+    onSubmit: (values) => {
+      cms.api.contentful.save(id, version, contentType, {
+        title: values.title,
+      });
     },
     fields: [
       {
@@ -70,7 +77,7 @@ export default function Post({ post: initialPost, morePosts, preview }) {
                 <title>
                   {post.title} | Next.js Blog Example with {CMS_NAME}
                 </title>
-                <meta property="og:image" content={post.ogImage.url} />
+                <meta property="og:image" content={post.ogImage?.url || ""} />
               </Head>
               <PostHeader
                 title={post.title}
@@ -88,11 +95,16 @@ export default function Post({ post: initialPost, morePosts, preview }) {
 }
 
 export async function getStaticProps({ params }) {
-  const posts = await client.getEntries({
-    content_type: "blogPost",
-    "fields.slug": params.slug,
-    include: 10,
-  });
+  const posts = (
+    await axios({
+      url:
+        `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
+        `access_token=${process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN}` +
+        `&fields.slug[match]=${params.slug}` +
+        `&content_type=blogPost`,
+      method: "GET",
+    })
+  ).data;
 
   if (posts.items.length != 1) {
     throw new Exception("Unique slug not found on post");
@@ -100,13 +112,29 @@ export async function getStaticProps({ params }) {
 
   const post = posts.items[0];
 
+  // const linkedPostData = (
+  //   await axios({
+  //     url:
+  //       `https://cdn.contentful.com/spaces/raftynxu3gyd/environments/master/entries/${post.sys.id}` +
+  //       `?access_token=${process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN}`,
+  //     method: "GET",
+  //   })
+  // ).data;
+
   const fields = {
-    title: post.fields.title,
-    date: post.fields.date,
-    slug: post.fields.slug,
-    author: post.fields.author.fields,
-    coverImage: post.fields.heroImage?.fields.file.url || "",
-    ogImage: post.fields.heroImage?.fields.file.url || "",
+    title: post.fields.title["en-US"],
+    date: post.fields.publishDate["en-US"],
+    slug: post.fields.slug["en-US"],
+    author: {
+      name: "Johnny",
+      image: {
+        fields: {
+          file: { url: "" },
+        },
+      },
+    }, //linkedPostData.fields.author.fields,
+    coverImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
+    ogImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
   };
 
   const content = await markdownToHtml(post.fields.body || "");
@@ -116,7 +144,8 @@ export async function getStaticProps({ params }) {
       post: {
         ...fields,
         content,
-        rawMarkdownBody: post.fields.body,
+        sys: post.sys,
+        rawMarkdownBody: post.fields.body["en-US"],
       },
     },
   };

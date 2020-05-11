@@ -17,19 +17,14 @@ limitations under the License.
 */
 const axios = require("axios");
 
-export const apiProxy = (req, res) => {
+const proxy = (req, res) => {
   const { headers, ...data } = JSON.parse(req.body);
-
-  console.log(
-    "process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN ",
-    process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN
-  );
 
   axios({
     ...data,
     headers: {
       ...headers,
-      Authorization: "token " + process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN,
+      Authorization: "Bearer " + process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN,
     },
   })
     .then((resp) => {
@@ -39,3 +34,5 @@ export const apiProxy = (req, res) => {
       res.status(err.response.status).json(err.response.data);
     });
 };
+
+export default proxy;
