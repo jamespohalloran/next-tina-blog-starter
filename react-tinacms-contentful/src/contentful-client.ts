@@ -22,13 +22,10 @@ export class ContentfulClient {
 
     let authTab: Window | undefined;
 
-    window.addEventListener("storage", (e: StorageEvent) => {
-      if (e.key == CONTENTFUL_AUTH_TOKEN) {
-        console.log("HEY HELLOOOOO");
-        Cookies.set(CONTENTFUL_AUTH_TOKEN, e.newValue, { sameSite: "strict" });
-        authTab.close();
-      }
+    window.addEventListener("contentfulAuthed", () => {
+      authTab.close();
     });
+
     authTab = popupWindow(url, "_blank", window, 1000, 700);
   }
 }
