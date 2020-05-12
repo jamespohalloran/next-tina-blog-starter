@@ -9,7 +9,7 @@ import PostTitle from "../../components/post-title";
 import Head from "next/head";
 import { CMS_NAME } from "../../lib/constants";
 import markdownToHtml from "../../lib/markdownToHtml";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useForm, usePlugin, useCMS } from "tinacms";
 
 import {
@@ -66,7 +66,7 @@ export default function Post({ post: initialPost, morePosts, preview }) {
         component: "text",
       },
       {
-        name: "rawMarkdownBody",
+        name: "body." + locale,
         label: "Content",
         component: "markdown",
       },
@@ -77,11 +77,10 @@ export default function Post({ post: initialPost, morePosts, preview }) {
   usePlugin(form);
 
   const [htmlContent, setHtmlContent] = useState(post.content);
-  const initialContent = useMemo(() => post.rawMarkdownBody, []);
+  // const initialContent = useMemo(() => post.content, []);
   useEffect(() => {
-    if (initialContent == post.rawMarkdownBody) return;
-    markdownToHtml(post.rawMarkdownBody).then(setHtmlContent);
-  }, [post.rawMarkdownBody]);
+    markdownToHtml(post.body[locale]).then(setHtmlContent);
+  }, [post.body[locale]]);
 
   return (
     <Layout preview={preview}>
