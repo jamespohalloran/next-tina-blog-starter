@@ -20,7 +20,7 @@ export class ContentfulClient {
       data: {
         fields: fields,
       },
-    }).then(() => window.location.reload());
+    });
   }
 
   async req(data: any) {

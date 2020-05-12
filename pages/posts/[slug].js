@@ -12,6 +12,11 @@ import markdownToHtml from "../../lib/markdownToHtml";
 import { useState, useEffect, useMemo } from "react";
 import { useForm, usePlugin, useCMS } from "tinacms";
 
+import {
+  getCachedFormData,
+  setCachedFormData,
+} from "../../components/react-tinacms-contentful/cachedFormData";
+
 const axios = require("axios");
 
 const client = require("contentful").createClient({
@@ -25,21 +30,34 @@ export default function Post({ post: initialPost, morePosts, preview }) {
 
   const locale = "en-US";
 
-  if (!router.isFallback && !initialPost?.fields.slug[locale]) {
-    return <ErrorPage statusCode={404} />;
-  }
-
   const id = initialPost.sys.id;
   const contentType = initialPost.sys.contentType.sys.id;
 
-  const version = initialPost.sys.version;
+  useEffect(() => {
+    setCachedFormData(id, {
+      version: initialPost.sys.version,
+    });
+  }, []);
+
+  if (!router.isFallback && !initialPost?.fields.slug[locale]) {
+    return <ErrorPage statusCode={404} />;
+  }
 
   const formConfig = {
     id: initialPost.fields.slug[locale],
     label: "Blog Post",
     initialValues: initialPost.fields,
-    onSubmit: (values) => {
-      cms.api.contentful.save(id, version, contentType, values);
+    onSubmit: async (values) => {
+      cms.api.contentful
+        .save(id, getCachedFormData(id).version, contentType, values)
+        .then(function (response) {
+          return response.json();
+        })
+        .then((data) => {
+          setCachedFormData(id, {
+            version: data.sys.version,
+          });
+        });
     },
     fields: [
       {
