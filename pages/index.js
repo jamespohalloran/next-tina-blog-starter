@@ -58,6 +58,6 @@ export async function getStaticProps() {
   });
 
   return {
-    props: { allPosts: results },
+    props: { allPosts: results, preview: false },
   };
 }
