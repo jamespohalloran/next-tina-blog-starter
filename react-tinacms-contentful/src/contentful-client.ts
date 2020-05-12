@@ -22,9 +22,7 @@ export class ContentfulClient {
 
     let authTab: Window | undefined;
 
-    window.addEventListener("contentfulAuthed", () => {
-      authTab.close();
-    });
+    // TODO: attach an event listener to the popup so that we can close it when auth has worked
 
     authTab = popupWindow(url, "_blank", window, 1000, 700);
   }
