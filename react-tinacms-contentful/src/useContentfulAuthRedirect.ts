@@ -7,6 +7,5 @@ export const useContentfulAuthRedirect = () => {
     const urlParams = new URLSearchParams(window.location.hash);
     const code = urlParams.get("#access_token");
     Cookies.set(CONTENTFUL_AUTH_TOKEN, code, { sameSite: "strict" });
-    dispatchEvent(new Event("contentfulAuthed"));
   }, []);
 };
