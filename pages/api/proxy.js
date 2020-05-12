@@ -15,24 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-const axios = require("axios");
-
-const proxy = (req, res) => {
-  const { headers, ...data } = JSON.parse(req.body);
-
-  axios({
-    ...data,
-    headers: {
-      ...headers,
-      Authorization: "Bearer " + process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN,
-    },
-  })
-    .then((resp) => {
-      res.status(resp.status).json(resp.data);
-    })
-    .catch((err) => {
-      res.status(err.response.status).json(err.response.data);
-    });
-};
+import { proxy } from "../../components/next-tinacms-contentful/next/proxy";
 
 export default proxy;
