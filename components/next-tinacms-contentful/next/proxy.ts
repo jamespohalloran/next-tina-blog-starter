@@ -1,3 +1,5 @@
+import { CONTENTFUL_AUTH_TOKEN } from "../../react-tinacms-contentful/contentful-client";
+
 const axios = require("axios");
 
 export const proxy = (req: any, res: any) => {
@@ -7,7 +9,7 @@ export const proxy = (req: any, res: any) => {
     ...data,
     headers: {
       ...headers,
-      Authorization: "Bearer " + process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN,
+      Authorization: "Bearer " + req.cookies[CONTENTFUL_AUTH_TOKEN],
     },
   })
     .then((resp: any) => {
