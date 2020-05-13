@@ -1,8 +1,8 @@
 import "../styles/index.css";
 import { TinaCMS, TinaProvider } from "tinacms";
 import { ContentfulClient } from "../components/react-tinacms-contentful/contentful-client";
-import { TinaContentfulProvider } from "../react-tinacms-contentful/src/TinacmsContentfulProvider";
-import { useContentfulEditing } from "../react-tinacms-contentful/src/useContentfulEditing";
+import { TinaContentfulProvider } from "../components/react-tinacms-contentful/TinacmsContentfulProvider";
+import { useContentfulEditing } from "../components/react-tinacms-contentful/useContentfulEditing";
 
 function MyApp({ Component, pageProps }) {
   const tinaConfig = {

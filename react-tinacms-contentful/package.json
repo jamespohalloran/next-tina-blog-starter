@@ -1,9 +1,0 @@
-{
-  "name": "react-tinacms-contentful",
-  "version": "0.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "dependencies": {
-    "js-cookie": "^2.2.1"
-  }
-}

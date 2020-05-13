@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import popupWindow from "../../react-tinacms-contentful/src/popupWindow";
+import popupWindow from "./popupWindow";
 
 export const CONTENTFUL_AUTH_TOKEN = "contentful_auth_token";
 
