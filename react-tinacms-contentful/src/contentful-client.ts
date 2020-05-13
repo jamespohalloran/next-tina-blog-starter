@@ -18,12 +18,16 @@ export class ContentfulClient {
   }
 
   authenticate() {
-    const url = `https://be.contentful.com/oauth/authorize?response_type=token&client_id=${this.clientId}&redirect_uri=${this.redirectUrl}&scope=content_management_manage`;
+    return new Promise((resolve) => {
+      let authTab: Window | undefined;
+      const url = `https://be.contentful.com/oauth/authorize?response_type=token&client_id=${this.clientId}&redirect_uri=${this.redirectUrl}&scope=content_management_manage`;
 
-    let authTab: Window | undefined;
-
-    // TODO: attach an event listener to the popup so that we can close it when auth has worked
-
-    authTab = popupWindow(url, "_blank", window, 1000, 700);
+      window.addEventListener("storage", function (e: StorageEvent) {
+        Cookies.set(CONTENTFUL_AUTH_TOKEN, e.newValue, { sameSite: "strict" });
+        authTab.close();
+        resolve();
+      });
+      authTab = popupWindow(url, "_blank", window, 1000, 700);
+    });
   }
 }
