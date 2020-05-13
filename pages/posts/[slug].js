@@ -9,8 +9,15 @@ import PostTitle from "../../components/post-title";
 import Head from "next/head";
 import { CMS_NAME } from "../../lib/constants";
 import markdownToHtml from "../../lib/markdownToHtml";
-import { useState, useEffect, useMemo } from "react";
-import { useForm, usePlugin } from "tinacms";
+import { useState, useEffect } from "react";
+import { useForm, usePlugin, useCMS } from "tinacms";
+
+import {
+  getCachedFormData,
+  setCachedFormData,
+} from "../../components/react-tinacms-contentful/cachedFormData";
+
+const axios = require("axios");
 
 const client = require("contentful").createClient({
   space: process.env.CONTENTFUL_SPACE_ID,
@@ -19,25 +26,47 @@ const client = require("contentful").createClient({
 
 export default function Post({ post: initialPost, morePosts, preview }) {
   const router = useRouter();
-  if (!router.isFallback && !initialPost?.slug) {
+  const cms = useCMS();
+
+  const locale = "en-US";
+
+  const id = initialPost.sys.id;
+  const contentType = initialPost.sys.contentType.sys.id;
+
+  useEffect(() => {
+    setCachedFormData(id, {
+      version: initialPost.sys.version,
+    });
+  }, []);
+
+  if (!router.isFallback && !initialPost?.fields.slug[locale]) {
     return <ErrorPage statusCode={404} />;
   }
 
   const formConfig = {
-    id: initialPost.slug,
+    id: initialPost.fields.slug[locale],
     label: "Blog Post",
-    initialValues: initialPost,
-    onSubmit: (values) => {
-      alert(`Submitting ${values.title}`);
+    initialValues: initialPost.fields,
+    onSubmit: async (values) => {
+      cms.api.contentful
+        .save(id, getCachedFormData(id).version, contentType, values)
+        .then(function (response) {
+          return response.json();
+        })
+        .then((data) => {
+          setCachedFormData(id, {
+            version: data.sys.version,
+          });
+        });
     },
     fields: [
       {
-        name: "title",
+        name: "title." + locale,
         label: "Post Title",
         component: "text",
       },
       {
-        name: "rawMarkdownBody",
+        name: "body." + locale,
         label: "Content",
         component: "markdown",
       },
@@ -48,11 +77,10 @@ export default function Post({ post: initialPost, morePosts, preview }) {
   usePlugin(form);
 
   const [htmlContent, setHtmlContent] = useState(post.content);
-  const initialContent = useMemo(() => post.rawMarkdownBody, []);
+  // const initialContent = useMemo(() => post.content, []);
   useEffect(() => {
-    if (initialContent == post.rawMarkdownBody) return;
-    markdownToHtml(post.rawMarkdownBody).then(setHtmlContent);
-  }, [post.rawMarkdownBody]);
+    markdownToHtml(post.body[locale]).then(setHtmlContent);
+  }, [post.body[locale]]);
 
   return (
     <Layout preview={preview}>
@@ -65,15 +93,15 @@ export default function Post({ post: initialPost, morePosts, preview }) {
             <article className="mb-32">
               <Head>
                 <title>
-                  {post.title} | Next.js Blog Example with {CMS_NAME}
+                  {post.title[locale]} | Next.js Blog Example with {CMS_NAME}
                 </title>
-                <meta property="og:image" content={post.ogImage.url} />
+                <meta property="og:image" content={post.ogImage?.url || ""} />
               </Head>
               <PostHeader
-                title={post.title}
+                title={post.title[locale]}
                 coverImage={post.coverImage}
-                date={post.date}
-                author={post.author}
+                date={post.date[locale]}
+                author={post.author[locale]}
               />
               <PostBody content={htmlContent} />
             </article>
@@ -85,11 +113,16 @@ export default function Post({ post: initialPost, morePosts, preview }) {
 }
 
 export async function getStaticProps({ params }) {
-  const posts = await client.getEntries({
-    content_type: "blogPost",
-    "fields.slug": params.slug,
-    include: 10,
-  });
+  const posts = (
+    await axios({
+      url:
+        `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
+        `access_token=${process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN}` +
+        `&fields.slug[match]=${params.slug}` +
+        `&content_type=blogPost`,
+      method: "GET",
+    })
+  ).data;
 
   if (posts.items.length != 1) {
     throw new Exception("Unique slug not found on post");
@@ -97,24 +130,33 @@ export async function getStaticProps({ params }) {
 
   const post = posts.items[0];
 
-  const fields = {
-    title: post.fields.title,
-    date: post.fields.date,
-    slug: post.fields.slug,
-    author: post.fields.author.fields,
-    coverImage: post.fields.heroImage?.fields.file.url || "",
-    ogImage: post.fields.heroImage?.fields.file.url || "",
-  };
+  // TODO - these are the fields used by out layout
+  // We no longer an map them here, as we will want to save them all out
+  // in original format
+
+  // const fields = {
+  //   title: post.fields.title["en-US"],
+  //   date: post.fields.publishDate["en-US"],
+  //   slug: post.fields.slug["en-US"],
+  //   author: {
+  //     name: "Johnny",
+  //     image: {
+  //       fields: {
+  //         file: { url: "" },
+  //       },
+  //     },
+  //   }, //linkedPostData.fields.author.fields,
+  //   coverImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
+  //   ogImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
+  // };
 
   const content = await markdownToHtml(post.fields.body || "");
 
   return {
     props: {
-      post: {
-        ...fields,
-        content,
-        rawMarkdownBody: post.fields.body,
-      },
+      post,
+      content,
+      rawMarkdownBody: post.fields.body["en-US"],
     },
   };
 }
