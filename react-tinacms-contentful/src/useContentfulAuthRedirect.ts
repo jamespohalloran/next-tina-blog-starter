@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { CONTENTFUL_AUTH_TOKEN } from "./contentful-client";
+import { CONTENTFUL_AUTH_TOKEN } from "../../components/react-tinacms-contentful/contentful-client";
 import Cookies from "js-cookie";
 
 export const useContentfulAuthRedirect = () => {
