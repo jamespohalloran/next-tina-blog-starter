@@ -32,6 +32,7 @@ function MyApp({ Component, pageProps }) {
         enterEditMode={enterEditMode}
         exitEditMode={exitEditMode}
       >
+        <EditLink editMode={false} />
         <Component {...pageProps} />
       </TinaContentfulProvider>
     </TinaProvider>

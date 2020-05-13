@@ -112,12 +112,16 @@ export default function Post({ post: initialPost, morePosts, preview }) {
   );
 }
 
-export async function getStaticProps({ params }) {
+export async function getStaticProps({ params, preview, previewData }) {
   const posts = (
     await axios({
       url:
         `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
-        `access_token=${process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN}` +
+        `access_token=${
+          preview
+            ? previewData.contentful_auth_token
+            : process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN
+        }` +
         `&fields.slug[match]=${params.slug}` +
         `&content_type=blogPost`,
       method: "GET",
