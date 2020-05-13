@@ -15,7 +15,7 @@ function MyApp({ Component, pageProps }) {
       }),
     },
     sidebar: {
-      hidden: false,
+      hidden: !pageProps.preview,
       position: "displace",
     },
     // toolbar: {
@@ -32,7 +32,7 @@ function MyApp({ Component, pageProps }) {
         enterEditMode={enterEditMode}
         exitEditMode={exitEditMode}
       >
-        <EditLink editMode={false} />
+        <EditLink editMode={pageProps.preview} />
         <Component {...pageProps} />
       </TinaContentfulProvider>
     </TinaProvider>
@@ -54,7 +54,9 @@ export const EditLink = ({ editMode }) => {
   const contentful = useContentfulEditing();
 
   return (
-    <button onClick={contentful.enterEditMode}>
+    <button
+      onClick={editMode ? contentful.exitEditMode : contentful.enterEditMode}
+    >
       {editMode ? "Exit Edit Mode" : "Edit This Site"}
     </button>
   );
