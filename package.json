@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "ssl-start": "node ssl-server"
   },
   "dependencies": {
     "axios": "^0.19.2",
