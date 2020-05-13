@@ -39,7 +39,7 @@ export default function Index({ allPosts }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getStaticProps({ preview, previewData }) {
   // Now that we have a space, we can get entries from that space
   const entries = await client.getEntries({
     content_type: "blogPost",
@@ -57,7 +57,12 @@ export async function getStaticProps() {
     };
   });
 
+  if (preview) {
+    return {
+      props: { allPosts: results, preview: true, ...previewData },
+    };
+  }
   return {
-    props: { allPosts: results },
+    props: { allPosts: results, preview: false },
   };
 }
