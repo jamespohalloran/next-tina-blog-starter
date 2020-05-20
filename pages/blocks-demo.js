@@ -41,24 +41,35 @@ export default function Post({ page, preview }) {
 
   const blocks = [
     {
-      label: "Setup Steps",
-      name: "setup.steps",
-      description: "Edit the steps here",
-      component: "group-list",
+      label: "Banner",
+      type: "banner",
+      key: undefined,
       //@ts-ignore
       itemProps: (item) => ({
         key: item.id,
-        label: `${item.step.slice(0, 15)}...`,
+        label: `${item.title.slice(0, 15)}...`,
       }),
       defaultItem: () => ({
-        step: "New Step",
-        _template: "setup_point",
+        title: "Here is a title",
+        subtitle: "This is a description",
+        buttonText: "Click me!",
+        _template: "banner",
       }),
       fields: [
         {
-          label: "Step",
-          name: "step",
+          label: "Title",
+          name: "title",
+          component: "text",
+        },
+        {
+          label: "Subtitle",
+          name: "subtitle",
           component: "textarea",
+        },
+        {
+          label: "Button Text",
+          name: "buttonText",
+          component: "text",
         },
       ],
     },
@@ -69,6 +80,7 @@ export default function Post({ page, preview }) {
     label: "Blog Post",
     initialValues: page.fields,
     onSubmit: async (values) => {
+      console.log("save values: ", values);
       cms.api.contentful
         .save(id, getCachedFormData(id).version, contentType, values)
         .then(function (response) {
@@ -115,7 +127,12 @@ export default function Post({ page, preview }) {
               </Head>
               <h1>{pageData.title[locale]}</h1>
               {fields.map((field) => (
-                <BannerText onDownloadClick={() => alert("neat")} />
+                <BannerText
+                  title={field.title}
+                  subtitle={field.subtitle}
+                  buttonText={field.buttonText}
+                  onDownloadClick={() => alert("neat")}
+                />
               ))}
             </article>
           </>
@@ -125,15 +142,13 @@ export default function Post({ page, preview }) {
   );
 }
 
-const BannerText = ({ onDownloadClick }) => (
+const BannerText = ({ onDownloadClick, title, subtitle, buttonText }) => (
   <Box between={5}>
-    <DisplayHeading>
-      Pay your bills and monitor internet usage on the go
-    </DisplayHeading>
-    <Paragraph>Download the new and improved My Account app today.</Paragraph>
+    <DisplayHeading>{title}</DisplayHeading>
+    <Paragraph>{subtitle}</Paragraph>
 
     <div>
-      <Button onClick={onDownloadClick}>Download now</Button>
+      <Button onClick={onDownloadClick}>{buttonText}</Button>
     </div>
   </Box>
 );
