@@ -17,6 +17,11 @@ import {
   setCachedFormData,
 } from "../../components/react-tinacms-contentful/cachedFormData";
 
+import Box from "@tds/core-box";
+import Button from "@tds/core-button";
+import DisplayHeading from "@tds/core-display-heading";
+import Paragraph from "@tds/core-paragraph";
+
 const axios = require("axios");
 
 const client = require("contentful").createClient({
@@ -103,6 +108,8 @@ export default function Post({ post: initialPost, morePosts, preview }) {
                 date={post.date[locale]}
                 author={post.author[locale]}
               />
+              <BannerText onDownloadClick={() => alert("neat")} />
+
               <PostBody content={htmlContent} />
             </article>
           </>
@@ -111,6 +118,19 @@ export default function Post({ post: initialPost, morePosts, preview }) {
     </Layout>
   );
 }
+
+const BannerText = ({ onDownloadClick }) => (
+  <Box between={5}>
+    <DisplayHeading>
+      Pay your bills and monitor internet usage on the go
+    </DisplayHeading>
+    <Paragraph>Download the new and improved My Account app today.</Paragraph>
+
+    <div>
+      <Button onClick={onDownloadClick}>Download now</Button>
+    </div>
+  </Box>
+);
 
 export async function getStaticProps({ params, preview, previewData }) {
   const posts = (
