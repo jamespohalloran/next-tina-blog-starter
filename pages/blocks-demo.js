@@ -42,9 +42,6 @@ export default function Post({ page, preview }) {
   const blocks = {
     banner: {
       label: "Banner",
-      type: "banner",
-      key: "banner",
-      name: "banner",
       //@ts-ignore
       itemProps: (item) => ({
         key: item.id,
@@ -54,7 +51,6 @@ export default function Post({ page, preview }) {
         title: "Here is a title",
         subtitle: "This is a description",
         buttonText: "Click me!",
-        // _template: "banner",
       },
       fields: [
         {
