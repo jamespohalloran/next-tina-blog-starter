@@ -39,22 +39,23 @@ export default function Post({ page, preview }) {
     return <ErrorPage statusCode={404} />;
   }
 
-  const blocks = [
-    {
+  const blocks = {
+    banner: {
       label: "Banner",
       type: "banner",
       key: "banner",
+      name: "banner",
       //@ts-ignore
       itemProps: (item) => ({
         key: item.id,
         label: `${item.title.slice(0, 15)}...`,
       }),
-      defaultItem: () => ({
+      defaultItem: {
         title: "Here is a title",
         subtitle: "This is a description",
         buttonText: "Click me!",
-        _template: "banner",
-      }),
+        // _template: "banner",
+      },
       fields: [
         {
           label: "Title",
@@ -73,7 +74,7 @@ export default function Post({ page, preview }) {
         },
       ],
     },
-  ];
+  };
 
   const formConfig = {
     id: page.fields.slug[locale],
