@@ -43,7 +43,7 @@ export default function Post({ page, preview }) {
     {
       label: "Banner",
       type: "banner",
-      key: undefined,
+      key: "banner",
       //@ts-ignore
       itemProps: (item) => ({
         key: item.id,
