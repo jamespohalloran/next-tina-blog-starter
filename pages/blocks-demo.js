@@ -13,6 +13,7 @@ import {
 } from "../components/react-tinacms-contentful/cachedFormData";
 import Collapsible from "../components/blocks/collapsible/Collapsible";
 import banner from "../components/blocks/banner/BannerBlock";
+import collapsible from "../components/blocks/collapsible/CollapsibleBlock";
 
 const axios = require("axios");
 
@@ -37,6 +38,7 @@ export default function Post({ page, preview }) {
 
   const blocks = {
     banner,
+    collapsible,
   };
 
   const formConfig = {
@@ -92,13 +94,22 @@ export default function Post({ page, preview }) {
               <h1>{pageData.title[locale]}</h1>
               {fields.map((field) => (
                 <>
-                  <BannerText
-                    title={field.title}
-                    subtitle={field.subtitle}
-                    buttonText={field.buttonText}
-                    onDownloadClick={() => alert("neat")}
-                  />
-                  <Collapsible />
+                  {field._template == "banner" && (
+                    <BannerText
+                      title={field.title}
+                      subtitle={field.subtitle}
+                      buttonText={field.buttonText}
+                      onDownloadClick={() => alert("neat")}
+                    />
+                  )}
+                  {field._template == "collapsible" && (
+                    <Collapsible
+                      title={field.title}
+                      subtitle={field.subtitle}
+                      buttonText={field.buttonText}
+                      onDownloadClick={() => alert("neat")}
+                    />
+                  )}
                 </>
               ))}
             </article>
