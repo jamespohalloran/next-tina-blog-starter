@@ -3,28 +3,38 @@ const CollapsibleBlock = {
   //@ts-ignore
   itemProps: (item) => ({
     key: item.id,
-    label: `${item.title.slice(0, 15)}...`,
+    label: `${item.length ? title.slice(0, 15) : "Panels"}...`,
   }),
   defaultItem: {
-    title: "Here is a title",
-    subtitle: "This is a description",
-    buttonText: "Click me!",
+    panels: [],
   },
   fields: [
     {
-      label: "Title",
-      name: "title",
-      component: "text",
-    },
-    {
-      label: "Subtitle",
-      name: "subtitle",
-      component: "textarea",
-    },
-    {
-      label: "Button Text",
-      name: "buttonText",
-      component: "text",
+      label: "Panels",
+      name: "panels",
+      component: "group-list",
+      defaultItem: () => ({
+        title: "Here is a title",
+        subtitle: "This is a description",
+        tertiaryText: "20.50",
+      }),
+      fields: [
+        {
+          label: "Title",
+          name: "title",
+          component: "text",
+        },
+        {
+          label: "Subtitle",
+          name: "subtitle",
+          component: "textarea",
+        },
+        {
+          label: "Tertiary Text",
+          name: "tertiaryText",
+          component: "text",
+        },
+      ],
     },
   ],
 };

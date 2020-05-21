@@ -103,12 +103,7 @@ export default function Post({ page, preview }) {
                     />
                   )}
                   {field._template == "collapsible" && (
-                    <Collapsible
-                      title={field.title}
-                      subtitle={field.subtitle}
-                      buttonText={field.buttonText}
-                      onDownloadClick={() => alert("neat")}
-                    />
+                    <Collapsible panels={field.panels} />
                   )}
                 </>
               ))}
