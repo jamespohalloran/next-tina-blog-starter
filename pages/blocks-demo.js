@@ -1,22 +1,18 @@
 import { useRouter } from "next/router";
 import ErrorPage from "next/error";
 import Container from "../components/container";
-import Header from "../components/header";
 import Layout from "../components/layout";
 import PostTitle from "../components/post-title";
 import Head from "next/head";
 import { useEffect } from "react";
 import { useForm, usePlugin, useCMS } from "tinacms";
-
+import BannerText from "../components/blocks/banner/Banner";
 import {
   getCachedFormData,
   setCachedFormData,
 } from "../components/react-tinacms-contentful/cachedFormData";
-
-import Box from "@tds/core-box";
-import Button from "@tds/core-button";
-import DisplayHeading from "@tds/core-display-heading";
-import Paragraph from "@tds/core-paragraph";
+import Collapsible from "../components/blocks/collapsible/Collapsible";
+import banner from "../components/blocks/banner/BannerBlock";
 
 const axios = require("axios");
 
@@ -40,36 +36,7 @@ export default function Post({ page, preview }) {
   }
 
   const blocks = {
-    banner: {
-      label: "Banner",
-      //@ts-ignore
-      itemProps: (item) => ({
-        key: item.id,
-        label: `${item.title.slice(0, 15)}...`,
-      }),
-      defaultItem: {
-        title: "Here is a title",
-        subtitle: "This is a description",
-        buttonText: "Click me!",
-      },
-      fields: [
-        {
-          label: "Title",
-          name: "title",
-          component: "text",
-        },
-        {
-          label: "Subtitle",
-          name: "subtitle",
-          component: "textarea",
-        },
-        {
-          label: "Button Text",
-          name: "buttonText",
-          component: "text",
-        },
-      ],
-    },
+    banner,
   };
 
   const formConfig = {
@@ -124,12 +91,15 @@ export default function Post({ page, preview }) {
               </Head>
               <h1>{pageData.title[locale]}</h1>
               {fields.map((field) => (
-                <BannerText
-                  title={field.title}
-                  subtitle={field.subtitle}
-                  buttonText={field.buttonText}
-                  onDownloadClick={() => alert("neat")}
-                />
+                <>
+                  <BannerText
+                    title={field.title}
+                    subtitle={field.subtitle}
+                    buttonText={field.buttonText}
+                    onDownloadClick={() => alert("neat")}
+                  />
+                  <Collapsible />
+                </>
               ))}
             </article>
           </>
@@ -138,17 +108,6 @@ export default function Post({ page, preview }) {
     </Layout>
   );
 }
-
-const BannerText = ({ onDownloadClick, title, subtitle, buttonText }) => (
-  <Box between={5}>
-    <DisplayHeading>{title}</DisplayHeading>
-    <Paragraph>{subtitle}</Paragraph>
-
-    <div>
-      <Button onClick={onDownloadClick}>{buttonText}</Button>
-    </div>
-  </Box>
-);
 
 export async function getStaticProps({ params, preview, previewData }) {
   const slug = "blocks-demo";
