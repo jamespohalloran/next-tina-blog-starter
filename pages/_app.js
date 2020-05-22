@@ -3,6 +3,7 @@ import { TinaCMS, TinaProvider } from "tinacms";
 import { ContentfulClient } from "../components/react-tinacms-contentful/contentful-client";
 import { TinaContentfulProvider } from "../components/react-tinacms-contentful/TinacmsContentfulProvider";
 import { useContentfulEditing } from "../components/react-tinacms-contentful/useContentfulEditing";
+import { LinkedAuthorInput } from "../components/react-tinacms-contentful/LinkedAuthorInput";
 
 function MyApp({ Component, pageProps }) {
   const tinaConfig = {
@@ -24,6 +25,10 @@ function MyApp({ Component, pageProps }) {
   };
 
   const cms = React.useMemo(() => new TinaCMS(tinaConfig), []);
+  cms.fields.add({
+    name: "linkedAuthor",
+    Component: LinkedAuthorInput,
+  });
 
   return (
     <TinaProvider cms={cms}>

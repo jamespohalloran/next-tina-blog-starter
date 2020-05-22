@@ -132,7 +132,7 @@ export async function getStaticProps({ params, preview, previewData }) {
     throw new Exception("Unique slug not found on post");
   }
 
-  const post = posts.items[0];
+  let post = posts.items[0];
 
   // TODO - these are the fields used by out layout
   // We no longer an map them here, as we will want to save them all out
@@ -155,16 +155,50 @@ export async function getStaticProps({ params, preview, previewData }) {
   // };
 
   const content = await markdownToHtml(post.fields.body || "");
+  const authors = await getAuthors(preview, previewData);
+
+  console.log("post");
+  console.log(JSON.stringify(post));
+
+  post = {
+    ...post,
+    fields: {
+      ...post.fields,
+      linkedAuthor: post.fields.author["en-US"].sys.id,
+    },
+  };
 
   return {
     props: {
       post,
       content,
+      authors,
       rawMarkdownBody: post.fields.body["en-US"],
     },
   };
 }
 
+export async function getAuthors(preview, previewData) {
+  const linkedAuthors = (
+    await axios({
+      url:
+        `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
+        `access_token=${
+          preview
+            ? previewData.contentful_auth_token
+            : process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN
+        }` +
+        `&content_type=person`,
+      method: "GET",
+    })
+  ).data;
+
+  const authors = linkedAuthors.items.map((author) => {
+    return { name: author.fields.name["en-US"], id: author.sys.id };
+  });
+
+  return authors;
+}
 export async function getStaticPaths() {
   // Now that we have a space, we can get entries from that space
   const entries = await client.getEntries({
