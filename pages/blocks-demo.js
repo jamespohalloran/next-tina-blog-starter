@@ -44,7 +44,7 @@ export default function Post({ page, preview }) {
   const getLocalizedValues = (values) => {
     const localizedValues = {};
     Object.keys(values).forEach(function (key, index) {
-      localizedValues[key] = { "en-US": values[key] };
+      localizedValues[key] = { [locale]: values[key] };
     });
     return localizedValues;
   };
