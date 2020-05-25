@@ -19,6 +19,7 @@
     "classnames": "2.2.6",
     "contentful": "^7.14.4",
     "contentful-management": "^5.26.1",
+    "contentful-resolve-response": "^1.1.4",
     "css-loader": "^3.5.3",
     "date-fns": "2.10.0",
     "dotenv": "^8.2.0",

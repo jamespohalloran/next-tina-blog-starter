@@ -4,7 +4,6 @@ import Paragraph from "@tds/core-paragraph";
 import Text from "@tds/core-text";
 
 const Collapsible = ({ panels = [] }) => {
-  console.log(panels);
   return (
     <ExpandCollapse topDivider={false} tag="h2">
       {panels.map((panel) => {

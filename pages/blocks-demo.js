@@ -14,6 +14,7 @@ import {
 import Collapsible from "../components/blocks/collapsible/Collapsible";
 import banner from "../components/blocks/banner/BannerBlock";
 import collapsible from "../components/blocks/collapsible/CollapsibleBlock";
+import resolveResponse from "contentful-resolve-response";
 
 const axios = require("axios");
 
@@ -44,7 +45,20 @@ export default function Post({ page, preview }) {
   const getLocalizedValues = (values) => {
     const localizedValues = {};
     Object.keys(values).forEach(function (key, index) {
-      localizedValues[key] = { [locale]: values[key] };
+      const fieldValue = values[key];
+      localizedValues[key] = { [locale]: fieldValue };
+
+      if (Array.isArray(fieldValue)) {
+        // TODO - this should check on links, not array
+        localizedValues[key] = {
+          [locale]: fieldValue.map((val) => {
+            const { space, contentType, environment, ...sys } = val.sys;
+            return { sys: { id: sys.id, type: "Link", linkType: "Entry" } };
+          }),
+        };
+      } else {
+        localizedValues[key] = { [locale]: fieldValue };
+      }
     });
     return localizedValues;
   };
@@ -139,12 +153,22 @@ export async function getStaticProps({ params, preview, previewData }) {
             : process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN
         }` +
         `&fields.slug[match]=${slug}` +
+        `&include=10` +
         `&content_type=blocksPage`,
       method: "GET",
     })
   ).data;
 
-  let page = pages.items[0];
+  const resolvedPages = resolveResponse(pages, {
+    removeUnresolved: true,
+    itemEntryPoints: ["fields"],
+  });
+
+  if (resolvedPages.length != 1) {
+    throw new Exception("Unique slug not found");
+  }
+
+  let page = resolvedPages[0];
 
   if (preview) {
     const managementPages = (
@@ -158,7 +182,7 @@ export async function getStaticProps({ params, preview, previewData }) {
       })
     ).data;
 
-    if (pages.items.length != 1 || managementPages.items.length != 1) {
+    if (managementPages.items.length != 1) {
       throw new Exception("Unique slug not found");
     }
 
