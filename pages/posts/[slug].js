@@ -39,7 +39,7 @@ export default function Post({ post: initialPost, morePosts, preview }) {
     });
   }, []);
 
-  if (!router.isFallback && !initialPost?.fields.slug[locale]) {
+  if (!router.isFallback && !initialPost?.fields.slug) {
     return <ErrorPage statusCode={404} />;
   }
 
@@ -61,12 +61,12 @@ export default function Post({ post: initialPost, morePosts, preview }) {
     },
     fields: [
       {
-        name: "title." + locale,
+        name: "title",
         label: "Post Title",
         component: "text",
       },
       {
-        name: "body." + locale,
+        name: "body",
         label: "Content",
         component: "markdown",
       },
@@ -79,8 +79,8 @@ export default function Post({ post: initialPost, morePosts, preview }) {
   const [htmlContent, setHtmlContent] = useState(post.content);
   // const initialContent = useMemo(() => post.content, []);
   useEffect(() => {
-    markdownToHtml(post.body[locale]).then(setHtmlContent);
-  }, [post.body[locale]]);
+    markdownToHtml(post.body).then(setHtmlContent);
+  }, [post.body]);
 
   return (
     <Layout preview={preview}>
@@ -93,15 +93,15 @@ export default function Post({ post: initialPost, morePosts, preview }) {
             <article className="mb-32">
               <Head>
                 <title>
-                  {post.title[locale]} | Next.js Blog Example with {CMS_NAME}
+                  {post.title} | Next.js Blog Example with {CMS_NAME}
                 </title>
                 <meta property="og:image" content={post.ogImage?.url || ""} />
               </Head>
               <PostHeader
-                title={post.title[locale]}
+                title={post.title}
                 coverImage={post.coverImage}
-                date={post.date[locale]}
-                author={post.author[locale]}
+                date={post.date}
+                author={post.author}
               />
               <PostBody content={htmlContent} />
             </article>
@@ -113,20 +113,10 @@ export default function Post({ post: initialPost, morePosts, preview }) {
 }
 
 export async function getStaticProps({ params, preview, previewData }) {
-  const posts = (
-    await axios({
-      url:
-        `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
-        `access_token=${
-          preview
-            ? previewData.contentful_auth_token
-            : process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN
-        }` +
-        `&fields.slug[match]=${params.slug}` +
-        `&content_type=blogPost`,
-      method: "GET",
-    })
-  ).data;
+  const posts = await client.getEntries({
+    content_type: "blogPost",
+    "fields.slug[match]": params.slug,
+  });
 
   if (posts.items.length != 1) {
     throw new Exception("Unique slug not found on post");
@@ -160,7 +150,7 @@ export async function getStaticProps({ params, preview, previewData }) {
     props: {
       post,
       content,
-      rawMarkdownBody: post.fields.body["en-US"],
+      rawMarkdownBody: post.fields.body,
     },
   };
 }
