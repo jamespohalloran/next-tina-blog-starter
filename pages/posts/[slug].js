@@ -70,6 +70,13 @@ export default function Post({ post: initialPost, morePosts, preview }) {
         label: "Content",
         component: "markdown",
       },
+      {
+        name: "author.sys.id",
+        label: "Author",
+        component: "contentful-linked-field",
+        contentfulClient: client,
+        initDisplay: initialPost.fields.author.fields.name,
+      },
     ],
   };
 
@@ -81,6 +88,11 @@ export default function Post({ post: initialPost, morePosts, preview }) {
   useEffect(() => {
     markdownToHtml(post.body).then(setHtmlContent);
   }, [post.body]);
+
+  const [author, setAuthor] = useState(post.author);
+  useEffect(() => {
+    getAuthorInfo(post.author.sys.id).then(setAuthor);
+  }, [post.author.sys.id]);
 
   return (
     <Layout preview={preview}>
@@ -101,7 +113,7 @@ export default function Post({ post: initialPost, morePosts, preview }) {
                 title={post.title}
                 coverImage={post.heroImage}
                 date={post.date}
-                author={post.author}
+                author={author}
               />
               <PostBody content={htmlContent} />
             </article>
@@ -110,6 +122,10 @@ export default function Post({ post: initialPost, morePosts, preview }) {
       </Container>
     </Layout>
   );
+}
+
+async function getAuthorInfo(authorId) {
+  return await client.getEntry(authorId);
 }
 
 export async function getStaticProps({ params, preview, previewData }) {
@@ -124,7 +140,6 @@ export async function getStaticProps({ params, preview, previewData }) {
 
   const post = posts.items[0];
 
-  console.log(JSON.stringify(post));
   // TODO - these are the fields used by out layout
   // We no longer an map them here, as we will want to save them all out
   // in original format
