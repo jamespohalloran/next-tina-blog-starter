@@ -99,7 +99,7 @@ export default function Post({ post: initialPost, morePosts, preview }) {
               </Head>
               <PostHeader
                 title={post.title}
-                coverImage={post.coverImage}
+                coverImage={post.heroImage}
                 date={post.date}
                 author={post.author}
               />
@@ -124,6 +124,7 @@ export async function getStaticProps({ params, preview, previewData }) {
 
   const post = posts.items[0];
 
+  console.log(JSON.stringify(post));
   // TODO - these are the fields used by out layout
   // We no longer an map them here, as we will want to save them all out
   // in original format
