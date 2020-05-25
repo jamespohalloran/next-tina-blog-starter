@@ -32,7 +32,7 @@ export default function Post({ page, preview }) {
     });
   }, []);
 
-  if (!router.isFallback && !page?.fields.slug[locale]) {
+  if (!router.isFallback && !page?.fields.slug) {
     return <ErrorPage statusCode={404} />;
   }
 
@@ -41,14 +41,23 @@ export default function Post({ page, preview }) {
     collapsible,
   };
 
+  const getLocalizedValues = (values) => {
+    const localizedValues = {};
+    Object.keys(values).forEach(function (key, index) {
+      localizedValues[key] = { "en-US": values[key] };
+    });
+    return localizedValues;
+  };
+
   const formConfig = {
-    id: page.fields.slug[locale],
+    id: page.fields.slug,
     label: "Blog Post",
     initialValues: page.fields,
     onSubmit: async (values) => {
-      console.log("save values: ", values);
+      const localizedValues = getLocalizedValues(values);
+
       cms.api.contentful
-        .save(id, getCachedFormData(id).version, contentType, values)
+        .save(id, getCachedFormData(id).version, contentType, localizedValues)
         .then(function (response) {
           return response.json();
         })
@@ -60,12 +69,12 @@ export default function Post({ page, preview }) {
     },
     fields: [
       {
-        name: "title." + locale,
+        name: "title",
         label: "Post Title",
         component: "text",
       },
       {
-        name: "fields." + locale + ".fields",
+        name: "fields" + ".fields",
         label: "Fields",
         component: "blocks",
         templates: blocks,
@@ -78,7 +87,7 @@ export default function Post({ page, preview }) {
   usePlugin(form);
 
   // const initialContent = useMemo(() => post.content, []);
-  const fields = pageData.fields[locale].fields;
+  const fields = pageData.fields.fields;
 
   return (
     <Layout preview={preview}>
@@ -89,9 +98,9 @@ export default function Post({ page, preview }) {
           <>
             <article className="mb-32">
               <Head>
-                <title>{pageData.title[locale]} | Next.js Blog Example</title>
+                <title>{pageData.title} | Next.js Blog Example</title>
               </Head>
-              <h1>{pageData.title[locale]}</h1>
+              <h1>{pageData.title}</h1>
               {fields.map((field) => (
                 <>
                   {field._template == "banner" && (
@@ -117,14 +126,17 @@ export default function Post({ page, preview }) {
 
 export async function getStaticProps({ params, preview, previewData }) {
   const slug = "blocks-demo";
+
   const pages = (
     await axios({
       url:
-        `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
+        `https://${
+          preview ? "preview" : "cdn"
+        }.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
         `access_token=${
           preview
-            ? previewData.contentful_auth_token
-            : process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN
+            ? process.env.CONTENTFUL_PREVIEW_API_TOKEN
+            : process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN
         }` +
         `&fields.slug[match]=${slug}` +
         `&content_type=blocksPage`,
@@ -132,13 +144,27 @@ export async function getStaticProps({ params, preview, previewData }) {
     })
   ).data;
 
-  if (pages.items.length != 1) {
-    throw new Exception("Unique slug not found");
+  let page = pages.items[0];
+
+  if (preview) {
+    const managementPages = (
+      await axios({
+        url:
+          `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
+          `access_token=${previewData.contentful_auth_token}` +
+          `&fields.slug[match]=${slug}` +
+          `&content_type=blocksPage`,
+        method: "GET",
+      })
+    ).data;
+
+    if (pages.items.length != 1 || managementPages.items.length != 1) {
+      throw new Exception("Unique slug not found");
+    }
+
+    page.sys.version = managementPages.items[0].sys.version;
   }
 
-  const page = pages.items[0];
-
-  console.log("page", page.fields.fields);
   return {
     props: {
       page,

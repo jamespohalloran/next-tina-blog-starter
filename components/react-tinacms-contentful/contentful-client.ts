@@ -31,7 +31,7 @@ export class ContentfulClient {
   authenticate() {
     return new Promise((resolve) => {
       let authTab: Window | undefined;
-      const url = `https://be.contentful.com/oauth/authorize?response_type=token&client_id=${this.clientId}&redirect_uri=${this.redirectUrl}&scope=content_management_manage`;
+      const url = `https://be.contentful.com/oauth/authorize?response_type=token&client_id=${this.clientId}&redirect_uri=${this.redirectUrl}&scope=content_management_read`;
 
       window.addEventListener("storage", function (e: StorageEvent) {
         if (e.newValue) {
