@@ -2,18 +2,12 @@ import styled from "styled-components";
 import { useState } from "react";
 import axios from "axios";
 
-type Option = {
-  id: string;
-  value: string;
-};
-
 interface LinkedSelectFieldProps {
   label?: string;
   name: string;
   component: string;
-  contentfulClient: any;
   initDisplay: string;
-  options?: Option[];
+  getOptions: (contentType: string) => any;
 }
 
 interface LinkedFieldInputProps {
@@ -32,24 +26,20 @@ export interface LinkedFieldProps {
   input: LinkedFieldInputProps;
   field: LinkedSelectFieldProps;
   tinaForm: any;
-  options?: Option[];
   disabled?: boolean;
 }
 
 export const ContentfulLinkedSelectField: React.FC<LinkedFieldProps> = (
   props
 ) => {
-  const client = props.field.contentfulClient;
-
   const [allOptions, setOptions] = useState([]);
 
-  console.log(JSON.stringify(props));
   return (
     <SelectElement>
       <select
         onChange={props.input.onChange}
         onMouseDown={(e) => {
-          client.getEntries({ content_type: "person" }).then((entries: any) => {
+          props.field.getOptions("person").then((entries: any) => {
             setOptions(entries.items);
           });
         }}

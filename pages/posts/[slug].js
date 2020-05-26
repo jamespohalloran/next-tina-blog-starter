@@ -74,7 +74,7 @@ export default function Post({ post: initialPost, morePosts, preview }) {
         name: "author.sys.id",
         label: "Author",
         component: "contentful-linked-field",
-        contentfulClient: client,
+        getOptions, // a function used to get the available options for the field
         initDisplay: initialPost.fields.author.fields.name,
       },
     ],
@@ -126,6 +126,10 @@ export default function Post({ post: initialPost, morePosts, preview }) {
 
 async function getAuthorInfo(authorId) {
   return await client.getEntry(authorId);
+}
+
+async function getOptions(contentType) {
+  return await client.getEntries({ content_type: contentType });
 }
 
 export async function getStaticProps({ params, preview, previewData }) {
