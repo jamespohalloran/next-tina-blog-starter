@@ -42,22 +42,28 @@ export default function Post({ page, preview }) {
     collapsible,
   };
 
+  const stripLinkedData = (fieldValue) => {
+    if (fieldValue.sys?.contentType.sys.type || "" == "Link") {
+      const { space, contentType, environment, ...sys } = fieldValue.sys;
+      return { sys: { id: sys.id, type: "Link", linkType: "Entry" } };
+    }
+    return fieldValue;
+  };
+
   const getLocalizedValues = (values) => {
     const localizedValues = {};
     Object.keys(values).forEach(function (key, index) {
       const fieldValue = values[key];
-      localizedValues[key] = { [locale]: fieldValue };
 
       if (Array.isArray(fieldValue)) {
         // TODO - this should check on links, not array
         localizedValues[key] = {
           [locale]: fieldValue.map((val) => {
-            const { space, contentType, environment, ...sys } = val.sys;
-            return { sys: { id: sys.id, type: "Link", linkType: "Entry" } };
+            return stripLinkedData(val);
           }),
         };
       } else {
-        localizedValues[key] = { [locale]: fieldValue };
+        localizedValues[key] = { [locale]: stripLinkedData(fieldValue) };
       }
     });
     return localizedValues;
