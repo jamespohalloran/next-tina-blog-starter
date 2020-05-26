@@ -28,8 +28,6 @@ export default function Post({ post: initialPost, morePosts, preview }) {
   const router = useRouter();
   const cms = useCMS();
 
-  const locale = "en-US";
-
   const id = initialPost.sys.id;
   const contentType = initialPost.sys.contentType.sys.id;
 
@@ -44,12 +42,14 @@ export default function Post({ post: initialPost, morePosts, preview }) {
   }
 
   const formConfig = {
-    id: initialPost.fields.slug[locale],
+    id: initialPost.fields.slug,
     label: "Blog Post",
     initialValues: initialPost.fields,
     onSubmit: async (values) => {
+      console.log(values);
+      const localizedValues = getLocalizedValues(values);
       cms.api.contentful
-        .save(id, getCachedFormData(id).version, contentType, values)
+        .save(id, getCachedFormData(id).version, contentType, localizedValues)
         .then(function (response) {
           return response.json();
         })
@@ -131,6 +131,13 @@ async function getAuthorInfo(authorId) {
 async function getOptions(contentType) {
   return await client.getEntries({ content_type: contentType });
 }
+const getLocalizedValues = (values) => {
+  const localizedValues = {};
+  Object.keys(values).forEach(function (key, index) {
+    localizedValues[key] = { "en-US": values[key] };
+  });
+  return localizedValues;
+};
 
 export async function getStaticProps({ params, preview, previewData }) {
   const posts = await client.getEntries({
@@ -142,27 +149,26 @@ export async function getStaticProps({ params, preview, previewData }) {
     throw new Exception("Unique slug not found on post");
   }
 
-  const post = posts.items[0];
+  let post = posts.items[0];
 
-  // TODO - these are the fields used by out layout
-  // We no longer an map them here, as we will want to save them all out
-  // in original format
+  if (preview) {
+    const managementPosts = (
+      await axios({
+        url:
+          `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
+          `access_token=${previewData.contentful_auth_token}` +
+          `&fields.slug[match]=${params.slug}` +
+          `&content_type=blogPost`,
+        method: "GET",
+      })
+    ).data;
 
-  // const fields = {
-  //   title: post.fields.title["en-US"],
-  //   date: post.fields.publishDate["en-US"],
-  //   slug: post.fields.slug["en-US"],
-  //   author: {
-  //     name: "Johnny",
-  //     image: {
-  //       fields: {
-  //         file: { url: "" },
-  //       },
-  //     },
-  //   }, //linkedPostData.fields.author.fields,
-  //   coverImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
-  //   ogImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
-  // };
+    if (managementPosts.items.length != 1) {
+      throw new Exception("Unique slug not found");
+    }
+
+    post.sys.version = managementPosts.items[0].sys.version;
+  }
 
   const content = await markdownToHtml(post.fields.body || "");
 
