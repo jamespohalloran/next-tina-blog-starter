@@ -3,6 +3,8 @@ import { TinaCMS, TinaProvider } from "tinacms";
 import { ContentfulClient } from "../components/react-tinacms-contentful/contentful-client";
 import { TinaContentfulProvider } from "../react-tinacms-contentful/src/TinacmsContentfulProvider";
 import { useContentfulEditing } from "../react-tinacms-contentful/src/useContentfulEditing";
+import { ContentfulLinkedSelectField } from "../react-tinacms-contentful/src/ContentfulLinkedSelectField";
+import { createEnumDeclaration } from "typescript";
 
 function MyApp({ Component, pageProps }) {
   const tinaConfig = {
@@ -24,6 +26,10 @@ function MyApp({ Component, pageProps }) {
   };
 
   const cms = React.useMemo(() => new TinaCMS(tinaConfig), []);
+  cms.fields.add({
+    name: "contentful-linked-field",
+    Component: ContentfulLinkedSelectField,
+  });
 
   return (
     <TinaProvider cms={cms}>

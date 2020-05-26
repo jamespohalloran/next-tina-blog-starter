@@ -21,6 +21,7 @@ import Box from "@tds/core-box";
 import Button from "@tds/core-button";
 import DisplayHeading from "@tds/core-display-heading";
 import Paragraph from "@tds/core-paragraph";
+import { createClient } from "contentful-management";
 
 const axios = require("axios");
 
@@ -29,7 +30,7 @@ const client = require("contentful").createClient({
   accessToken: process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN,
 });
 
-export default function Post({ post: initialPost, morePosts, preview }) {
+export default function Post({ post: initialPost, morePosts, preview, der }) {
   const router = useRouter();
   const cms = useCMS();
 
@@ -44,17 +45,31 @@ export default function Post({ post: initialPost, morePosts, preview }) {
     });
   }, []);
 
-  if (!router.isFallback && !initialPost?.fields.slug[locale]) {
+  if (!router.isFallback && !initialPost?.fields.slug) {
     return <ErrorPage statusCode={404} />;
   }
 
   const formConfig = {
-    id: initialPost.fields.slug[locale],
+    id: initialPost.fields.slug,
     label: "Blog Post",
     initialValues: initialPost.fields,
     onSubmit: async (values) => {
+      Object.keys(values).map((key) => {
+        if (values[key].sys) {
+          initialPost.managementPost.fields[key]["en-US"].sys.id =
+            values[key].sys.id;
+        } else {
+          initialPost.managementPost.fields[key]["en-US"] = values[key];
+        }
+      });
+
       cms.api.contentful
-        .save(id, getCachedFormData(id).version, contentType, values)
+        .save(
+          id,
+          initialPost.managementPost.sys.version,
+          contentType,
+          initialPost.managementPost.fields
+        )
         .then(function (response) {
           return response.json();
         })
@@ -66,14 +81,20 @@ export default function Post({ post: initialPost, morePosts, preview }) {
     },
     fields: [
       {
-        name: "title." + locale,
+        name: "title",
         label: "Post Title",
         component: "text",
       },
       {
-        name: "body." + locale,
+        name: "body",
         label: "Content",
         component: "markdown",
+      },
+      {
+        name: "author.sys.id",
+        label: "author",
+        component: "contentful-linked-field",
+        getOptions,
       },
     ],
   };
@@ -84,8 +105,12 @@ export default function Post({ post: initialPost, morePosts, preview }) {
   const [htmlContent, setHtmlContent] = useState(post.content);
   // const initialContent = useMemo(() => post.content, []);
   useEffect(() => {
-    markdownToHtml(post.body[locale]).then(setHtmlContent);
-  }, [post.body[locale]]);
+    markdownToHtml(post.body).then(setHtmlContent);
+  }, [post.body]);
+  const [author, setAuthor] = useState(post.author);
+  useEffect(() => {
+    getAuthorInfo(post.author.sys.id).then(setAuthor);
+  }, [post.author.sys.id]);
 
   return (
     <Layout preview={preview}>
@@ -98,15 +123,15 @@ export default function Post({ post: initialPost, morePosts, preview }) {
             <article className="mb-32">
               <Head>
                 <title>
-                  {post.title[locale]} | Next.js Blog Example with {CMS_NAME}
+                  {post.title} | Next.js Blog Example with {CMS_NAME}
                 </title>
                 <meta property="og:image" content={post.ogImage?.url || ""} />
               </Head>
               <PostHeader
-                title={post.title[locale]}
+                title={post.title}
                 coverImage={post.coverImage}
-                date={post.date[locale]}
-                author={post.author[locale]}
+                date={post.date}
+                author={author}
               />
               <BannerText onDownloadClick={() => alert("neat")} />
 
@@ -131,58 +156,56 @@ const BannerText = ({ onDownloadClick }) => (
     </div>
   </Box>
 );
+async function getAuthorInfo(authorId) {
+  return await client.getEntry(authorId);
+}
+
+async function getOptions(contentType) {
+  return await client.getEntries({ content_type: contentType });
+}
+
+const getLocalizedValues = (values) => {
+  const localizedValues = {};
+  Object.keys(values).forEach(function (key, index) {
+    localizedValues[key] = { "en-US": values[key] };
+  });
+  return localizedValues;
+};
 
 export async function getStaticProps({ params, preview, previewData }) {
-  const posts = (
-    await axios({
-      url:
-        `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
-        `access_token=${
-          preview
-            ? previewData.contentful_auth_token
-            : process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN
-        }` +
-        `&fields.slug[match]=${params.slug}` +
-        `&content_type=blogPost`,
-      method: "GET",
-    })
-  ).data;
-
-  if (posts.items.length != 1) {
-    throw new Exception("Unique slug not found on post");
-  }
-
-  const post = posts.items[0];
-
-  // TODO - these are the fields used by out layout
-  // We no longer an map them here, as we will want to save them all out
-  // in original format
-
-  // const fields = {
-  //   title: post.fields.title["en-US"],
-  //   date: post.fields.publishDate["en-US"],
-  //   slug: post.fields.slug["en-US"],
-  //   author: {
-  //     name: "Johnny",
-  //     image: {
-  //       fields: {
-  //         file: { url: "" },
-  //       },
-  //     },
-  //   }, //linkedPostData.fields.author.fields,
-  //   coverImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
-  //   ogImage: "", //linkedPostData.fields.heroImage?.fields.file.url || "",
-  // };
-
+  let post = await getPost(preview, params);
   const content = await markdownToHtml(post.fields.body || "");
+
+  const managementClient = createClient({
+    accessToken: process.env.CONTENTFUL_MANAGEMENT_ACCESS_TOKEN,
+  });
+  const managementPost = await managementClient
+    .getSpace("raftynxu3gyd")
+    .then((space) => space.getEnvironment("master"))
+    .then((environment) => environment.getEntry(post.sys.id));
+
+  post.sys.version = managementPost.sys.version;
+  post.managementPost = managementPost.toPlainObject();
 
   return {
     props: {
       post,
       content,
-      rawMarkdownBody: post.fields.body["en-US"],
+      rawMarkdownBody: post.fields.body,
     },
   };
+}
+
+async function getPost(preview, params) {
+  const posts = await client.getEntries({
+    content_type: "blogPost",
+    "fields.slug[match]": params.slug,
+  });
+  if (posts.items.length != 1) {
+    throw new Exception("Unique slug not found on post");
+  }
+  const post = posts.items[0];
+  return post;
 }
 
 export async function getStaticPaths() {
