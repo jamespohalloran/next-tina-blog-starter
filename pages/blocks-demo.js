@@ -106,9 +106,6 @@ export default function Post({ page, preview }) {
 
   usePlugin(form);
 
-  // const initialContent = useMemo(() => post.content, []);
-  const fields = pageData.fields.fields;
-
   return (
     <Layout preview={preview}>
       <Container>
@@ -121,7 +118,26 @@ export default function Post({ page, preview }) {
                 <title>{pageData.title} | Next.js Blog Example</title>
               </Head>
               <h1>{pageData.title}</h1>
-              {fields.map((field) => (
+              {pageData.typedFields.map((block) => {
+                const fieldType = block.sys.contentType.sys.id;
+                return (
+                  <>
+                    {fieldType == "banner" && (
+                      <BannerText
+                        title={block.fields.title}
+                        subtitle={block.fields.subtitle}
+                        buttonText={block.fields.buttonText}
+                        onDownloadClick={() => alert("neat")}
+                      />
+                    )}
+                    {fieldType == "collapsible" && (
+                      <Collapsible panels={block.fields.panels} />
+                    )}
+                  </>
+                );
+              })}
+
+              {/* {fields.map((field) => (
                 <>
                   {field._template == "banner" && (
                     <BannerText
@@ -135,7 +151,7 @@ export default function Post({ page, preview }) {
                     <Collapsible panels={field.panels} />
                   )}
                 </>
-              ))}
+              ))} */}
             </article>
           </>
         )}
