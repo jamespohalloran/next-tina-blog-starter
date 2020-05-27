@@ -55,7 +55,11 @@ export const ContentfulLinkedSelectField: React.FC<LinkedFieldProps> = (
 };
 
 function toComponent(linkedField: any) {
-  return <option value={linkedField.sys.id}>{linkedField.fields.name}</option>;
+  return (
+    <option value={JSON.stringify(linkedField)}>
+      {linkedField.fields.name}
+    </option>
+  );
 }
 
 const SelectElement = styled.div`

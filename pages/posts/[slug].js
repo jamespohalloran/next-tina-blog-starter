@@ -91,9 +91,10 @@ export default function Post({ post: initialPost, morePosts, preview, der }) {
         component: "markdown",
       },
       {
-        name: "author.sys.id",
+        name: "author",
         label: "author",
         component: "contentful-linked-field",
+        parse: (value) => JSON.parse(value),
         getOptions,
       },
     ],
@@ -107,10 +108,6 @@ export default function Post({ post: initialPost, morePosts, preview, der }) {
   useEffect(() => {
     markdownToHtml(post.body).then(setHtmlContent);
   }, [post.body]);
-  const [author, setAuthor] = useState(post.author);
-  useEffect(() => {
-    getAuthorInfo(post.author.sys.id).then(setAuthor);
-  }, [post.author.sys.id]);
 
   return (
     <Layout preview={preview}>
@@ -131,7 +128,7 @@ export default function Post({ post: initialPost, morePosts, preview, der }) {
                 title={post.title}
                 coverImage={post.coverImage}
                 date={post.date}
-                author={author}
+                author={post.author}
               />
               <BannerText onDownloadClick={() => alert("neat")} />
 
