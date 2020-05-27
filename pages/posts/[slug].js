@@ -153,12 +153,9 @@ const BannerText = ({ onDownloadClick }) => (
     </div>
   </Box>
 );
-async function getAuthorInfo(authorId) {
-  return await client.getEntry(authorId);
-}
 
-async function getOptions(contentType) {
-  return await client.getEntries({ content_type: contentType });
+async function getOptions() {
+  return await client.getEntries({ content_type: "person" });
 }
 
 const getLocalizedValues = (values) => {

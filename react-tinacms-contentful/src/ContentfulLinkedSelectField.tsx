@@ -7,7 +7,7 @@ interface LinkedSelectFieldProps {
   name: string;
   component: string;
   initDisplay: string;
-  getOptions: (contentType: string) => any;
+  getOptions: () => any;
 }
 
 interface LinkedFieldInputProps {
@@ -33,7 +33,7 @@ export const ContentfulLinkedSelectField: React.FC<LinkedFieldProps> = (
       <select
         onChange={props.input.onChange}
         onMouseDown={(e) => {
-          props.field.getOptions("person").then((entries: any) => {
+          props.field.getOptions().then((entries: any) => {
             setOptions(entries.items);
           });
         }}
