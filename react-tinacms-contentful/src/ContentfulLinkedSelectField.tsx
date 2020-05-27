@@ -50,7 +50,7 @@ export const ContentfulLinkedSelectField: React.FC<LinkedFieldProps> = (
   );
 };
 
-function toComponent(option: any, selected?: any) {
+function toComponent(option: any, selected: any) {
   selected = option.sys.id === selected.sys.id ? "selected" : "";
   return (
     <option value={JSON.stringify(option)} selected>
