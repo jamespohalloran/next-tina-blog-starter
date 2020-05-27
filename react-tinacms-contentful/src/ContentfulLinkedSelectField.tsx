@@ -12,13 +12,7 @@ interface LinkedSelectFieldProps {
 
 interface LinkedFieldInputProps {
   name: string;
-  value: {
-    sys: {
-      type: string;
-      linkType: string;
-      id: string;
-    };
-  };
+  value: any;
   onChange?: any;
 }
 export interface LinkedFieldProps {
@@ -47,7 +41,9 @@ export const ContentfulLinkedSelectField: React.FC<LinkedFieldProps> = (
         {allOptions.length !== 0 ? (
           allOptions.map(toComponent)
         ) : (
-          <option>{props.field.initDisplay}</option>
+          <option value={JSON.stringify(props.input.value)}>
+            {props.input.value.fields.name}
+          </option>
         )}
       </select>
     </SelectElement>
