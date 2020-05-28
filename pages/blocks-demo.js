@@ -12,7 +12,7 @@ import {
   setCachedFormData,
 } from "../components/react-tinacms-contentful/cachedFormData";
 import Collapsible from "../components/blocks/collapsible/Collapsible";
-import banner from "../components/blocks/banner/BannerBlock";
+import banner from "../components/blocks/banner/BannerLinkBlock";
 import collapsible from "../components/blocks/collapsible/CollapsibleBlock";
 import resolveResponse from "contentful-resolve-response";
 
@@ -69,10 +69,19 @@ export default function Post({ page, preview }) {
     return localizedValues;
   };
 
+  console.log("page.fields", page.fields);
+
+  const typedFields = page.fields.typedFields.map((block) => {
+    return {
+      ...block,
+      _template: block.sys.contentType.sys.id,
+    };
+  });
+
   const formConfig = {
     id: page.fields.slug,
     label: "Blog Post",
-    initialValues: page.fields,
+    initialValues: { ...page.fields, typedFields },
     onSubmit: async (values) => {
       const localizedValues = getLocalizedValues(values);
 
@@ -93,9 +102,15 @@ export default function Post({ page, preview }) {
         label: "Post Title",
         component: "text",
       },
+      // {
+      //   name: "fields" + ".fields",
+      //   label: "Fields",
+      //   component: "blocks",
+      //   templates: blocks,
+      // },
       {
-        name: "fields" + ".fields",
-        label: "Fields",
+        name: "typedFields",
+        label: "Typed Fields",
         component: "blocks",
         templates: blocks,
       },

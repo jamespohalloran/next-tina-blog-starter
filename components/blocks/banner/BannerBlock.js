@@ -13,17 +13,17 @@ const Banner = {
   fields: [
     {
       label: "Title",
-      name: "title",
+      name: "fields.title",
       component: "text",
     },
     {
       label: "Subtitle",
-      name: "subtitle",
+      name: "fields.subtitle",
       component: "textarea",
     },
     {
       label: "Button Text",
-      name: "buttonText",
+      name: "fields.buttonText",
       component: "text",
     },
   ],
