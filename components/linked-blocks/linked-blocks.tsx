@@ -105,7 +105,13 @@ const genRandomString = () => {
   );
 };
 
-const AddBlockForm = ({ field }: { field: BlocksFieldDefinititon }) => {
+const AddBlockForm = ({
+  field,
+  onAddBlock,
+}: {
+  field: BlocksFieldDefinititon;
+  onAddBlock: any;
+}) => {
   const cms = useCMS();
 
   const [
@@ -164,8 +170,12 @@ const AddBlockForm = ({ field }: { field: BlocksFieldDefinititon }) => {
                     currentAddingBlock?.id,
                     mapLocalizedValues(values, "en-US")
                   )
-                  .then(() => {
+                  .then(function (response: any) {
+                    return response.json();
+                  })
+                  .then((data: any) => {
                     setCurrentAddingBlock(null);
+                    onAddBlock(data);
                   });
               },
             }}
@@ -197,6 +207,11 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
     [field.name, form.mutators]
   );
 
+  const onSelectBlock = (block: any) => {
+    // addItem(block)
+    console.log(`newBlock`, block);
+  };
+
   const items = input.value || [];
 
   return (
@@ -208,7 +223,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </GroupListMeta>
-        <AddBlockForm field={field} />
+        <AddBlockForm field={field} onAddBlock={onSelectBlock} />
       </GroupListHeader>
       <GroupListPanel>
         <ItemList>
