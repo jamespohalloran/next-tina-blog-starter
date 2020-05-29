@@ -28,12 +28,10 @@ import {
 import { FormBuilder, FieldsBuilder } from "@tinacms/form-builder";
 import { useMemo } from "react";
 import { Form } from "@tinacms/forms";
-import { AddIcon } from "@tinacms/icons";
-import { IconButton, Button } from "@tinacms/styles";
-import { Dismissible } from "react-dismissible";
-import { useCMS, useSubscribable } from "@tinacms/react-core";
+import { Button } from "@tinacms/styles";
+import { useCMS } from "@tinacms/react-core";
 
-export const FormModal = ({ plugin, close }: any) => {
+export const AddBlockModal = ({ plugin, close }: any) => {
   const cms = useCMS();
   const form: Form = useMemo(
     () =>

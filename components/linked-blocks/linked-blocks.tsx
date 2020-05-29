@@ -30,7 +30,7 @@ import {
 import { Dismissible } from "react-dismissible";
 import { IconButton } from "@tinacms/styles";
 import { useFormPortal } from "@tinacms/react-forms";
-import { FormModal } from "./FormModal";
+import { AddBlockModal } from "./AddBlockModal";
 import { useCMS } from "tinacms";
 import {
   mapLocalizedValues,
@@ -99,6 +99,49 @@ const genRandomString = () => {
   );
 };
 
+const AddBlockButton = styled(IconButton)`
+  width: auto;
+`;
+
+const LinkBlockForm = ({
+  field,
+  onAddBlock,
+}: {
+  field: BlocksFieldDefinititon;
+  onAddBlock: any;
+}) => {
+  const cms = useCMS();
+
+  const [
+    currentAddingBlock,
+    setCurrentAddingBlock,
+  ] = React.useState<Block | null>(null); //TODO - this name is pretty poor
+
+  const [visible, setVisible] = React.useState(false);
+
+  return (
+    <>
+      <AddBlockButton
+        onClick={() => setVisible(true)}
+        open={visible}
+        primary
+        small
+      >
+        <AddIcon />
+        Link existing block
+      </AddBlockButton>
+
+      <Dismissible
+        escape
+        onDismiss={() => setVisible(false)}
+        disabled={!visible}
+      >
+        {visible && <div>BLOCK MODAL GOES HUR</div>}
+      </Dismissible>
+    </>
+  );
+};
+
 const AddBlockForm = ({
   field,
   onAddBlock,
@@ -117,9 +160,15 @@ const AddBlockForm = ({
 
   return (
     <>
-      <IconButton onClick={() => setVisible(true)} open={visible} primary small>
+      <AddBlockButton
+        onClick={() => setVisible(true)}
+        open={visible}
+        primary
+        small
+      >
         <AddIcon />
-      </IconButton>
+        Add and link new block
+      </AddBlockButton>
       <BlockMenu open={visible}>
         <Dismissible
           click
@@ -150,7 +199,7 @@ const AddBlockForm = ({
         disabled={!currentAddingBlock}
       >
         {currentAddingBlock && (
-          <FormModal
+          <AddBlockModal
             plugin={{
               name: `New ${currentAddingBlock.template.label}`,
               fields: currentAddingBlock.template.fields,
@@ -206,6 +255,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
           )}
         </GroupListMeta>
         <AddBlockForm field={field} onAddBlock={onSelectBlock} />
+        <LinkBlockForm field={field} onAddBlock={onSelectBlock} />
       </GroupListHeader>
       <GroupListPanel>
         <ItemList>
