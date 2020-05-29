@@ -30,6 +30,7 @@ import {
 import { Dismissible } from "react-dismissible";
 import { IconButton } from "@tinacms/styles";
 import { useFormPortal } from "@tinacms/react-forms";
+import { FormModal } from "./FormModal";
 
 // import { Droppable, Draggable } from "react-beautiful-dnd";
 // import { GroupPanel, PanelHeader, PanelBody } from "./GroupFieldPlugin";
@@ -95,6 +96,17 @@ interface BlockFieldProps {
   tinaForm: Form;
 }
 
+const AddBlockForm = ({ template }: { template: BlockTemplate }) => {
+  const plugin = {
+    name: `New ${template.label}`,
+    fields: template.fields,
+    onSubmit: () => {},
+  };
+
+  console.log(`creating plugin`, template);
+  return <FormModal plugin={plugin} close={() => {}} />;
+};
+
 const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
   const addItem = React.useCallback(
     (name: string, template: BlockTemplate) => {
@@ -112,9 +124,15 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
 
   const items = input.value || [];
 
+  const [
+    currentBlockTemplate,
+    setCurrentBlockTemplate,
+  ] = React.useState<BlockTemplate | null>(null);
+
   const [visible, setVisible] = React.useState(false);
   return (
     <>
+      {currentBlockTemplate && <AddBlockForm template={currentBlockTemplate} />}
       <GroupListHeader>
         <GroupListMeta>
           <GroupLabel>{field.label || field.name}</GroupLabel>
@@ -142,7 +160,8 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                 <BlockOption
                   key={name}
                   onClick={() => {
-                    addItem(name, template);
+                    // addItem(name, template);
+                    setCurrentBlockTemplate(template);
                     setVisible(false);
                   }}
                 >

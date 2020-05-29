@@ -12,7 +12,7 @@ import {
   setCachedFormData,
 } from "../components/react-tinacms-contentful/cachedFormData";
 import Collapsible from "../components/blocks/collapsible/Collapsible";
-import banner from "../components/blocks/banner/BannerLinkBlock";
+import banner from "../components/blocks/banner/BannerBlock";
 import collapsible from "../components/blocks/collapsible/CollapsibleBlock";
 import resolveResponse from "contentful-resolve-response";
 
