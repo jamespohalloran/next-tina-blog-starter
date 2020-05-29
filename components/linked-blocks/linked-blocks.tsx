@@ -38,6 +38,7 @@ import {
 } from "../../lib/mapLocalizedValues";
 
 import { Droppable, Draggable } from "react-beautiful-dnd";
+import { LinkBlockModal } from "./LinkBlockModal";
 
 const GroupPanel = styled.div<any>``;
 const PanelHeader = styled.div``;
@@ -112,11 +113,6 @@ const LinkBlockForm = ({
 }) => {
   const cms = useCMS();
 
-  const [
-    currentAddingBlock,
-    setCurrentAddingBlock,
-  ] = React.useState<Block | null>(null); //TODO - this name is pretty poor
-
   const [visible, setVisible] = React.useState(false);
 
   return (
@@ -136,7 +132,12 @@ const LinkBlockForm = ({
         onDismiss={() => setVisible(false)}
         disabled={!visible}
       >
-        {visible && <div>BLOCK MODAL GOES HUR</div>}
+        {visible && (
+          <LinkBlockModal
+            onSubmit={(values: any, cms: any) => {}}
+            close={() => setVisible(false)}
+          />
+        )}
       </Dismissible>
     </>
   );
