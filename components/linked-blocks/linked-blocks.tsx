@@ -31,6 +31,8 @@ import { Dismissible } from "react-dismissible";
 import { IconButton } from "@tinacms/styles";
 import { useFormPortal } from "@tinacms/react-forms";
 import { FormModal } from "./FormModal";
+import { useCMS } from "tinacms";
+import { mapLocalizedValues } from "../../lib/mapLocalizedValues";
 
 // import { Droppable, Draggable } from "react-beautiful-dnd";
 // import { GroupPanel, PanelHeader, PanelBody } from "./GroupFieldPlugin";
@@ -96,16 +98,42 @@ interface BlockFieldProps {
   tinaForm: Form;
 }
 
-const AddBlockForm = ({ template }: { template: BlockTemplate }) => {
+const genRandomString = () => {
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
+};
+
+const AddBlockForm = ({
+  template,
+  contentTypeId,
+}: {
+  template: BlockTemplate;
+  contentTypeId: string;
+}) => {
+  const cms = useCMS();
   const plugin = {
     name: `New ${template.label}`,
     fields: template.fields,
-    onSubmit: () => {},
+    onSubmit: (values: any, cms: any) => {
+      return cms.api.contentful.save(
+        genRandomString(),
+        undefined,
+        contentTypeId,
+        mapLocalizedValues(values, "en-US")
+      );
+    },
   };
 
   console.log(`creating plugin`, template);
   return <FormModal plugin={plugin} close={() => {}} />;
 };
+
+interface Block {
+  id: string;
+  template: BlockTemplate;
+}
 
 const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
   const addItem = React.useCallback(
@@ -125,14 +153,19 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
   const items = input.value || [];
 
   const [
-    currentBlockTemplate,
-    setCurrentBlockTemplate,
-  ] = React.useState<BlockTemplate | null>(null);
+    currentAddingBlock,
+    setCurrentAddingBlock,
+  ] = React.useState<Block | null>(null); //TODO - this name is pretty poor
 
   const [visible, setVisible] = React.useState(false);
   return (
     <>
-      {currentBlockTemplate && <AddBlockForm template={currentBlockTemplate} />}
+      {currentAddingBlock && (
+        <AddBlockForm
+          contentTypeId={currentAddingBlock.id}
+          template={currentAddingBlock.template}
+        />
+      )}
       <GroupListHeader>
         <GroupListMeta>
           <GroupLabel>{field.label || field.name}</GroupLabel>
@@ -156,12 +189,12 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             disabled={!visible}
           >
             <BlockMenuList>
-              {Object.entries(field.templates).map(([name, template]) => (
+              {Object.entries(field.templates).map(([id, template]) => (
                 <BlockOption
-                  key={name}
+                  key={id}
                   onClick={() => {
                     // addItem(name, template);
-                    setCurrentBlockTemplate(template);
+                    setCurrentAddingBlock({ id, template });
                     setVisible(false);
                   }}
                 >
