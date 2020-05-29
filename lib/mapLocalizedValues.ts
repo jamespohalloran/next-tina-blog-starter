@@ -24,3 +24,11 @@ export const mapLocalizedValues = (values: any, locale: string) => {
   });
   return localizedValues;
 };
+
+export const getLocaleValues = (localizedValues: any, locale: string) => {
+  const values: any = {};
+  Object.keys(localizedValues).forEach(function (key) {
+    values[key] = localizedValues[key][locale];
+  });
+  return values;
+};

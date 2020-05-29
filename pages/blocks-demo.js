@@ -69,8 +69,6 @@ export default function Post({ page, preview }) {
     return localizedValues;
   };
 
-  console.log("page.fields", page.fields);
-
   const typedFields = page.fields.typedFields.map((block) => {
     return {
       ...block,

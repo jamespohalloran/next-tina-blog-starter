@@ -32,7 +32,10 @@ import { IconButton } from "@tinacms/styles";
 import { useFormPortal } from "@tinacms/react-forms";
 import { FormModal } from "./FormModal";
 import { useCMS } from "tinacms";
-import { mapLocalizedValues } from "../../lib/mapLocalizedValues";
+import {
+  mapLocalizedValues,
+  getLocaleValues,
+} from "../../lib/mapLocalizedValues";
 
 // import { Droppable, Draggable } from "react-beautiful-dnd";
 // import { GroupPanel, PanelHeader, PanelBody } from "./GroupFieldPlugin";
@@ -121,8 +124,6 @@ const AddBlockForm = ({
 
   const [visible, setVisible] = React.useState(false);
 
-  console.log(`field!!::`, field);
-
   return (
     <>
       <IconButton onClick={() => setVisible(true)} open={visible} primary small>
@@ -193,23 +194,12 @@ interface Block {
 }
 
 const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
-  const addItem = React.useCallback(
-    (name: string, template: BlockTemplate) => {
-      let obj: any = {};
-      if (typeof template.defaultItem === "function") {
-        obj = template.defaultItem();
-      } else {
-        obj = template.defaultItem || {};
-      }
-      obj._template = name;
-      form.mutators.insert(field.name, 0, obj);
-    },
-    [field.name, form.mutators]
-  );
-
   const onSelectBlock = (block: any) => {
-    // addItem(block)
-    console.log(`newBlock`, block);
+    const formattedBlock = {
+      ...block,
+      fields: getLocaleValues(block.fields, "en-US"),
+    };
+    form.mutators.push(field.name, formattedBlock);
   };
 
   const items = input.value || [];
