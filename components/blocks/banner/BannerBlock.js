@@ -3,7 +3,7 @@ const Banner = {
   //@ts-ignore
   itemProps: (item) => ({
     key: item.id,
-    label: `${item.title.slice(0, 15)}...`,
+    label: `${item.fields.title?.slice(0, 15)}...` || "Unnamed Block",
   }),
   defaultItem: {
     title: "Here is a title",

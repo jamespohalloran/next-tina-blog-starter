@@ -37,14 +37,7 @@ import {
   getLocaleValues,
 } from "../../lib/mapLocalizedValues";
 
-// import { Droppable, Draggable } from "react-beautiful-dnd";
-// import { GroupPanel, PanelHeader, PanelBody } from "./GroupFieldPlugin";
-// import { FieldDescription } from "./wrapFieldWithMeta";
-// import {
-//   GroupListHeader,
-//   GroupListMeta,
-//   GroupLabel,
-// } from "./GroupListFieldPlugin";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 
 const GroupPanel = styled.div<any>``;
 const PanelHeader = styled.div``;
@@ -53,8 +46,6 @@ const FieldDescription = styled.div``;
 const GroupListHeader = styled.div``;
 const GroupListMeta = styled.div``;
 const GroupLabel = styled.div<any>``;
-const Draggable = styled.div<any>``;
-const Droppable = styled.div<any>``;
 
 export interface BlocksFieldDefinititon extends Field {
   component: "linked-blocks";
@@ -161,14 +152,14 @@ const AddBlockForm = ({
         {currentAddingBlock && (
           <FormModal
             plugin={{
-              name: `New ${currentAddingBlock?.template.label}`,
-              fields: currentAddingBlock?.template.fields,
+              name: `New ${currentAddingBlock.template.label}`,
+              fields: currentAddingBlock.template.fields,
               onSubmit: (values: any, cms: any) => {
                 return cms.api.contentful
                   .save(
                     genRandomString(),
                     undefined,
-                    currentAddingBlock?.id,
+                    currentAddingBlock.id,
                     mapLocalizedValues(values, "en-US")
                   )
                   .then(function (response: any) {
@@ -198,6 +189,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
     const formattedBlock = {
       ...block,
       fields: getLocaleValues(block.fields, "en-US"),
+      _template: block.sys.contentType.sys.id, //TODO - this is a bit icky
     };
     form.mutators.push(field.name, formattedBlock);
   };
