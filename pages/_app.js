@@ -5,7 +5,7 @@ import { TinaContentfulProvider } from "../react-tinacms-contentful/src/TinacmsC
 import { useContentfulEditing } from "../react-tinacms-contentful/src/useContentfulEditing";
 import { ContentfulLinkedSelectField } from "../react-tinacms-contentful/src/ContentfulLinkedSelectField";
 import { createEnumDeclaration } from "typescript";
-
+import { BlocksFieldPlugin } from "../components/linked-blocks/linked-blocks";
 function MyApp({ Component, pageProps }) {
   const tinaConfig = {
     apis: {
@@ -30,6 +30,7 @@ function MyApp({ Component, pageProps }) {
     name: "contentful-linked-field",
     Component: ContentfulLinkedSelectField,
   });
+  cms.fields.add(BlocksFieldPlugin);
 
   return (
     <TinaProvider cms={cms}>

@@ -111,7 +111,7 @@ export default function Post({ page, preview }) {
       {
         name: "typedFields",
         label: "Typed Fields",
-        component: "blocks",
+        component: "linked-blocks",
         templates: blocks,
       },
     ],
