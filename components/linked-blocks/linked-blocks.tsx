@@ -105,29 +105,76 @@ const genRandomString = () => {
   );
 };
 
-const AddBlockForm = ({
-  template,
-  contentTypeId,
-}: {
-  template: BlockTemplate;
-  contentTypeId: string;
-}) => {
+const AddBlockForm = ({ field }: { field: BlocksFieldDefinititon }) => {
   const cms = useCMS();
-  const plugin = {
-    name: `New ${template.label}`,
-    fields: template.fields,
-    onSubmit: (values: any, cms: any) => {
-      return cms.api.contentful.save(
-        genRandomString(),
-        undefined,
-        contentTypeId,
-        mapLocalizedValues(values, "en-US")
-      );
-    },
-  };
 
-  console.log(`creating plugin`, template);
-  return <FormModal plugin={plugin} close={() => {}} />;
+  const [
+    currentAddingBlock,
+    setCurrentAddingBlock,
+  ] = React.useState<Block | null>(null); //TODO - this name is pretty poor
+
+  const [visible, setVisible] = React.useState(false);
+
+  console.log(`field!!::`, field);
+
+  return (
+    <>
+      <IconButton onClick={() => setVisible(true)} open={visible} primary small>
+        <AddIcon />
+      </IconButton>
+      <BlockMenu open={visible}>
+        <Dismissible
+          click
+          escape
+          onDismiss={() => setVisible(false)}
+          disabled={!visible}
+        >
+          <BlockMenuList>
+            {Object.entries(field.templates).map(([id, template]) => (
+              <BlockOption
+                key={id}
+                onClick={() => {
+                  // addItem(name, template);
+                  setCurrentAddingBlock({ id, template });
+                  setVisible(false);
+                }}
+              >
+                {template.label}
+              </BlockOption>
+            ))}
+          </BlockMenuList>
+        </Dismissible>
+      </BlockMenu>
+
+      <Dismissible
+        escape
+        onDismiss={() => setCurrentAddingBlock(null)}
+        disabled={!currentAddingBlock}
+      >
+        {currentAddingBlock && (
+          <FormModal
+            plugin={{
+              name: `New ${currentAddingBlock?.template.label}`,
+              fields: currentAddingBlock?.template.fields,
+              onSubmit: (values: any, cms: any) => {
+                return cms.api.contentful
+                  .save(
+                    genRandomString(),
+                    undefined,
+                    currentAddingBlock?.id,
+                    mapLocalizedValues(values, "en-US")
+                  )
+                  .then(() => {
+                    setCurrentAddingBlock(null);
+                  });
+              },
+            }}
+            close={() => setCurrentAddingBlock(null)}
+          />
+        )}
+      </Dismissible>
+    </>
+  );
 };
 
 interface Block {
@@ -152,20 +199,8 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
 
   const items = input.value || [];
 
-  const [
-    currentAddingBlock,
-    setCurrentAddingBlock,
-  ] = React.useState<Block | null>(null); //TODO - this name is pretty poor
-
-  const [visible, setVisible] = React.useState(false);
   return (
     <>
-      {currentAddingBlock && (
-        <AddBlockForm
-          contentTypeId={currentAddingBlock.id}
-          template={currentAddingBlock.template}
-        />
-      )}
       <GroupListHeader>
         <GroupListMeta>
           <GroupLabel>{field.label || field.name}</GroupLabel>
@@ -173,37 +208,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </GroupListMeta>
-        <IconButton
-          onClick={() => setVisible(true)}
-          open={visible}
-          primary
-          small
-        >
-          <AddIcon />
-        </IconButton>
-        <BlockMenu open={visible}>
-          <Dismissible
-            click
-            escape
-            onDismiss={() => setVisible(false)}
-            disabled={!visible}
-          >
-            <BlockMenuList>
-              {Object.entries(field.templates).map(([id, template]) => (
-                <BlockOption
-                  key={id}
-                  onClick={() => {
-                    // addItem(name, template);
-                    setCurrentAddingBlock({ id, template });
-                    setVisible(false);
-                  }}
-                >
-                  {template.label}
-                </BlockOption>
-              ))}
-            </BlockMenuList>
-          </Dismissible>
-        </BlockMenu>
+        <AddBlockForm field={field} />
       </GroupListHeader>
       <GroupListPanel>
         <ItemList>
