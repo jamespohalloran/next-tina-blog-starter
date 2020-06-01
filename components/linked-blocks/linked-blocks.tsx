@@ -134,7 +134,9 @@ const LinkBlockForm = ({
       >
         {visible && (
           <LinkBlockModal
-            onSubmit={(values: any, cms: any) => {}}
+            onSubmit={(values: any, cms: any) => {
+              onAddBlock(values);
+            }}
             close={() => setVisible(false)}
           />
         )}

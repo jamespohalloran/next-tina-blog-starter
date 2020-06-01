@@ -69,7 +69,7 @@ export default function Post({ page, preview }) {
     return localizedValues;
   };
 
-  const typedFields = page.fields.typedFields.map((block) => {
+  const typedFields = (page.fields.typedFields || []).map((block) => {
     return {
       ...block,
       _template: block.sys.contentType.sys.id,
@@ -174,7 +174,7 @@ export default function Post({ page, preview }) {
 }
 
 export async function getStaticProps({ params, preview, previewData }) {
-  const slug = "blocks-demo";
+  const slug = "blocks-demo4";
 
   const pages = (
     await axios({

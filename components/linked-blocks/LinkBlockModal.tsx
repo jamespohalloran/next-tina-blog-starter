@@ -30,6 +30,7 @@ import { useMemo } from "react";
 import { Form } from "@tinacms/forms";
 import { Button } from "@tinacms/styles";
 import { useCMS } from "@tinacms/react-core";
+import { mapLocalizedValues } from "../../lib/mapLocalizedValues";
 
 export const LinkBlockModal = ({ onSubmit, close }: any) => {
   const cms = useCMS();
@@ -39,11 +40,32 @@ export const LinkBlockModal = ({ onSubmit, close }: any) => {
         label: "link-form",
         id: "link-form-id",
         actions: [],
-        fields: [],
+        fields: [
+          /*  TODO - Make this a select field */
+          {
+            label: "Block ID",
+            name: "id",
+            description: "Enter the block id, in which you would like to link",
+            component: "text",
+          },
+        ],
         onSubmit(values) {
-          onSubmit(values, cms).then(() => {
-            close();
-          });
+          const dummyVals = {
+            sys: {
+              contentType: {
+                sys: {
+                  id: "banner", //TODO remove this hardcoded type
+                  type: "Link",
+                  linkType: "Entry",
+                },
+              },
+              id: values.id,
+            },
+            fields: [],
+          };
+
+          onSubmit(dummyVals, cms);
+          close();
         },
       }),
     [close, cms, onSubmit]
