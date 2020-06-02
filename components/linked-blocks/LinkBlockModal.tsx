@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from "react";
-import styled, { css } from "styled-components";
 import {
   Modal,
   ModalHeader,
@@ -32,31 +31,30 @@ import { Button } from "@tinacms/styles";
 import { useCMS } from "@tinacms/react-core";
 import { mapLocalizedValues } from "../../lib/mapLocalizedValues";
 
-const client = require("contentful").createClient({
-  space: process.env.CONTENTFUL_SPACE_ID,
-  accessToken: process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN,
-});
-
-export const LinkBlockModal = ({ onSubmit, close }: any) => {
+export const LinkBlockModal = ({ onSubmit, close, models }: any) => {
   const cms = useCMS();
 
-  const getOptions = async () => {
-    const result = await cms.api.contentful.fetchEntries("banner");
-    {
-      /* TODO - pull content_type from available templates */
-    }
+  let form: Form;
 
-    return result;
+  const getOptions = async () => {
+    const model = form.values["content-model"] || models[0];
+    return cms.api.contentful.fetchEntries(model);
   };
 
-  const form: Form = useMemo(
+  form = useMemo(
     () =>
       new Form({
         label: "link-form",
         id: "link-form-id",
         actions: [],
         fields: [
-          /*  TODO - Make this a select field */
+          {
+            name: "content-model",
+            component: "select",
+            label: "Block type",
+            description: "What type of block would you like to add?",
+            options: models,
+          },
           {
             name: "selected",
             label: "Block",
@@ -103,58 +101,3 @@ export const LinkBlockModal = ({ onSubmit, close }: any) => {
     </Modal>
   );
 };
-
-const ContentMenuWrapper = styled.div`
-  position: relative;
-  grid-area: actions;
-  justify-self: end;
-`;
-
-const ContentMenu = styled.div<{ open: boolean }>`
-  min-width: 192px;
-  border-radius: var(--tina-radius-big);
-  border: 1px solid var(--tina-color-grey-2);
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 150ms ease-out;
-  transform-origin: 100% 0;
-  box-shadow: var(--tina-shadow-big);
-  background-color: white;
-  overflow: hidden;
-  z-index: var(--tina-z-index-1);
-
-  ${(props) =>
-    props.open &&
-    css`
-      opacity: 1;
-      pointer-events: all;
-      transform: translate3d(0, 44px, 0) scale3d(1, 1, 1);
-    `};
-`;
-
-const CreateButton = styled.button`
-  position: relative;
-  text-align: center;
-  font-size: var(--tina-font-size-0);
-  padding: 0 12px;
-  height: 40px;
-  font-weight: 500;
-  width: 100%;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  border: 0;
-  transition: all 85ms ease-out;
-  &:hover {
-    color: var(--tina-color-primary);
-    background-color: #f6f6f9;
-  }
-  &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
-  }
-`;

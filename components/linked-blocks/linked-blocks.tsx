@@ -138,6 +138,7 @@ const LinkBlockForm = ({
               onAddBlock(values);
             }}
             close={() => setVisible(false)}
+            models={Object.keys(field.templates)}
           />
         )}
       </Dismissible>
