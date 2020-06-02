@@ -40,10 +40,12 @@ export const ContentfulLinkedSelectField: React.FC<LinkedFieldProps> = (
       >
         {allOptions.length !== 0 ? (
           allOptions.map((option) => toComponent(option, props.input.value))
-        ) : (
+        ) : props.input.value ? (
           <option value={JSON.stringify(props.input.value)}>
             {props.input.value.fields.name}
           </option>
+        ) : (
+          <></>
         )}
       </select>
     </SelectElement>
@@ -51,10 +53,11 @@ export const ContentfulLinkedSelectField: React.FC<LinkedFieldProps> = (
 };
 
 function toComponent(option: any, selected: any) {
-  selected = option.sys.id === selected.sys.id ? "selected" : "";
+  selected = selected && option.sys.id === selected.sys.id ? "selected" : "";
   return (
     <option value={JSON.stringify(option)} selected>
-      {option.fields.name}
+      {option.fields.title || option.fields.name}{" "}
+      {/* TODO - make this customizable */}
     </option>
   );
 }

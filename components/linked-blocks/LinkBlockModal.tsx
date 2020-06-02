@@ -32,6 +32,20 @@ import { Button } from "@tinacms/styles";
 import { useCMS } from "@tinacms/react-core";
 import { mapLocalizedValues } from "../../lib/mapLocalizedValues";
 
+const client = require("contentful").createClient({
+  space: process.env.CONTENTFUL_SPACE_ID,
+  accessToken: process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN,
+});
+
+const getOptions = async () => {
+  const result = await client.getEntries({ content_type: "banner" });
+  {
+    /* TODO - pull content_type from available templates */
+  }
+  console.log("result!", result);
+  return result;
+};
+
 export const LinkBlockModal = ({ onSubmit, close }: any) => {
   const cms = useCMS();
   const form: Form = useMemo(
@@ -43,28 +57,19 @@ export const LinkBlockModal = ({ onSubmit, close }: any) => {
         fields: [
           /*  TODO - Make this a select field */
           {
-            label: "Block ID",
-            name: "id",
-            description: "Enter the block id, in which you would like to link",
-            component: "text",
+            name: "selected",
+            label: "Block",
+            component: "contentful-linked-field",
+            parse: (value) => JSON.parse(value),
+            getOptions,
           },
         ],
         onSubmit(values) {
-          const dummyVals = {
-            sys: {
-              contentType: {
-                sys: {
-                  id: "banner", //TODO remove this hardcoded type
-                  type: "Link",
-                  linkType: "Entry",
-                },
-              },
-              id: values.id,
-            },
-            fields: [],
+          const localizedResult = {
+            sys: values.selected.sys,
+            fields: mapLocalizedValues(values.selected.fields, "en-US"),
           };
-
-          onSubmit(dummyVals, cms);
+          onSubmit(localizedResult, cms);
           close();
         },
       }),
