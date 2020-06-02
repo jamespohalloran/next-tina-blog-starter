@@ -49,6 +49,22 @@ export class ContentfulClient {
     });
   }
 
+  async fetchEntries(contentModel: string) {
+    return new Promise((resolve, reject) => {
+      this.req({
+        url: `https://preview.contentful.com/spaces/${this.space}/environments/master/entries?content_type=${contentModel}`,
+        method: "GET",
+        headers: {},
+      })
+        .then(function (response) {
+          resolve(response.json());
+        })
+        .catch(function (e) {
+          reject(e);
+        });
+    });
+  }
+
   async save(id: string, version: string, contentModel: string, fields: any) {
     console.log("Saving entity: ", id, fields);
     return this.req({

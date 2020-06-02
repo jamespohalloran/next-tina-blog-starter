@@ -37,17 +37,18 @@ const client = require("contentful").createClient({
   accessToken: process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN,
 });
 
-const getOptions = async () => {
-  const result = await client.getEntries({ content_type: "banner" });
-  {
-    /* TODO - pull content_type from available templates */
-  }
-  console.log("result!", result);
-  return result;
-};
-
 export const LinkBlockModal = ({ onSubmit, close }: any) => {
   const cms = useCMS();
+
+  const getOptions = async () => {
+    const result = await cms.api.contentful.fetchEntries("banner");
+    {
+      /* TODO - pull content_type from available templates */
+    }
+
+    return result;
+  };
+
   const form: Form = useMemo(
     () =>
       new Form({
