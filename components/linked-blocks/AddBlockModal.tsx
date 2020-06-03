@@ -30,9 +30,11 @@ import { useMemo } from "react";
 import { Form } from "@tinacms/forms";
 import { Button } from "@tinacms/styles";
 import { useCMS } from "@tinacms/react-core";
+import { FormView } from "@tinacms/react-forms";
 
 export const AddBlockModal = ({ plugin, close }: any) => {
   const cms = useCMS();
+
   const form: Form = useMemo(
     () =>
       new Form({
@@ -50,64 +52,16 @@ export const AddBlockModal = ({ plugin, close }: any) => {
   );
   return (
     <Modal>
-      <FormBuilder form={form}>
-        {({ handleSubmit }) => {
-          return (
-            <ModalPopup>
-              <ModalHeader close={close}>{plugin.name}</ModalHeader>
-              <ModalBody
-                onKeyPress={(e) =>
-                  e.charCode === 13 ? (handleSubmit() as any) : null
-                }
-              >
-                <FieldsBuilder form={form} fields={form.fields} />
-              </ModalBody>
-              <ModalActions>
-                <Button onClick={close}>Cancel</Button>
-                <Button onClick={handleSubmit as any} primary>
-                  Create
-                </Button>
-              </ModalActions>
-            </ModalPopup>
-          );
-        }}
-      </FormBuilder>
+      <ModalPopup>
+        <ModalHeader close={close}>{plugin.name}</ModalHeader>
+        <ModalBody>
+          <FormView activeForm={form} />
+          {/* <FieldsBuilder form={form} fields={form.fields} /> */}
+        </ModalBody>
+      </ModalPopup>
     </Modal>
   );
 };
-
-const ContentMenuWrapper = styled.div`
-  position: relative;
-  grid-area: actions;
-  justify-self: end;
-`;
-
-const ContentMenu = styled.div<{ open: boolean }>`
-  min-width: 192px;
-  border-radius: var(--tina-radius-big);
-  border: 1px solid var(--tina-color-grey-2);
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 150ms ease-out;
-  transform-origin: 100% 0;
-  box-shadow: var(--tina-shadow-big);
-  background-color: white;
-  overflow: hidden;
-  z-index: var(--tina-z-index-1);
-
-  ${(props) =>
-    props.open &&
-    css`
-      opacity: 1;
-      pointer-events: all;
-      transform: translate3d(0, 44px, 0) scale3d(1, 1, 1);
-    `};
-`;
 
 const CreateButton = styled.button`
   position: relative;
