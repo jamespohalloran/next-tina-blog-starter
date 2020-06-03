@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from "react";
-import { Field, Form } from "@tinacms/forms";
+import { Field, Form, FormOptions } from "@tinacms/forms";
 import styled, { css } from "styled-components";
 import { FieldsBuilder } from "@tinacms/form-builder";
 import {
@@ -31,7 +31,16 @@ import { Dismissible } from "react-dismissible";
 import { IconButton } from "@tinacms/styles";
 import { useFormPortal } from "@tinacms/react-forms";
 import { AddBlockModal } from "./AddBlockModal";
-import { useCMS } from "tinacms";
+import {
+  useCMS,
+  Modal,
+  ModalPopup,
+  ModalHeader,
+  ModalBody,
+  useForm,
+} from "tinacms";
+import { FormView } from "@tinacms/react-forms";
+import templates from "../templates/templates";
 import {
   mapLocalizedValues,
   getLocaleValues,
@@ -359,21 +368,69 @@ const BlockListItem = ({
               <TrashIcon />
             </DeleteButton>
           </ItemHeader>
-          <FormPortal>
-            <Panel
-              isExpanded={isExpanded}
-              setExpanded={setExpanded}
-              field={field}
-              item={block}
-              index={index}
-              tinaForm={tinaForm}
-              label={label || template.label}
-              template={template}
-            />
-          </FormPortal>
+
+          {isExpanded && (
+            <Dismissible
+              escape
+              onDismiss={() => setExpanded(false)}
+              disabled={!isExpanded}
+            >
+              <ContentfulFormModal
+                close={() => setExpanded(false)}
+                label={label}
+                block={block}
+              />
+            </Dismissible>
+          )}
         </>
       )}
     </Draggable>
+  );
+};
+
+interface ContentfulFormModalProps {
+  block: any;
+  label?: string;
+  close: () => void;
+}
+const ContentfulFormModal = ({
+  block,
+  label,
+  close,
+}: ContentfulFormModalProps) => {
+  const cms = useCMS();
+  const contentModel = block.sys.contentType.sys.id;
+  const formConfig = {
+    ...templates[contentModel],
+    id: block.sys.id,
+    initialValues: block.fields,
+    onSubmit: (values: any) => {
+      return cms.api.contentful
+        .save(
+          block.sys.id,
+          block.sys.version,
+          contentModel,
+          mapLocalizedValues(values, "en-US")
+        )
+        .then(function (response: any) {
+          return response.json();
+        })
+        .then((data: any) => {
+          close();
+        });
+    },
+  } as FormOptions<any, any>;
+  const [pageData, form] = useForm(formConfig);
+
+  return (
+    <Modal>
+      <ModalPopup>
+        <ModalHeader close={close}>{label}</ModalHeader>
+        <ModalBody>
+          <FormView activeForm={form} />
+        </ModalBody>
+      </ModalPopup>
+    </Modal>
   );
 };
 
