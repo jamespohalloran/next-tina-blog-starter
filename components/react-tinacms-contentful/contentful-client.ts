@@ -49,6 +49,22 @@ export class ContentfulClient {
     });
   }
 
+  async fetchEntry(id: string) {
+    return new Promise((resolve, reject) => {
+      this.req({
+        url: `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries/${id}`,
+        method: "GET",
+        headers: {},
+      })
+        .then(function (response) {
+          resolve(response.json());
+        })
+        .catch(function (e) {
+          reject(e);
+        });
+    });
+  }
+
   async fetchEntries(contentModel: string) {
     return new Promise((resolve, reject) => {
       this.req({

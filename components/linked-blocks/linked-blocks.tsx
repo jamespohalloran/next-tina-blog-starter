@@ -393,22 +393,20 @@ interface ContentfulFormModalProps {
   label?: string;
   close: () => void;
 }
-const ContentfulFormModal = ({
-  block,
-  label,
-  close,
-}: ContentfulFormModalProps) => {
+
+const LinkForm = ({ entry, close }: any) => {
   const cms = useCMS();
-  const contentModel = block.sys.contentType.sys.id;
+  const contentModel = entry.sys.contentType.sys.id;
+
   const formConfig = {
     ...templates[contentModel],
-    id: block.sys.id,
-    initialValues: block.fields,
+    id: entry.sys.id,
+    initialValues: getLocaleValues(entry.fields, "en-US"),
     onSubmit: (values: any) => {
       return cms.api.contentful
         .save(
-          block.sys.id,
-          block.sys.version,
+          entry.sys.id,
+          entry.sys.version,
           contentModel,
           mapLocalizedValues(values, "en-US")
         )
@@ -422,12 +420,29 @@ const ContentfulFormModal = ({
   } as FormOptions<any, any>;
   const [pageData, form] = useForm(formConfig);
 
+  return <FormView activeForm={form} />;
+};
+
+const ContentfulFormModal = ({
+  block,
+  label,
+  close,
+}: ContentfulFormModalProps) => {
+  const cms = useCMS();
+  const [entry, setEntry] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    cms.api.contentful.fetchEntry(block.sys.id).then((entry: any) => {
+      setEntry(entry);
+    });
+  });
+
   return (
     <Modal>
       <ModalPopup>
         <ModalHeader close={close}>{label}</ModalHeader>
         <ModalBody>
-          <FormView activeForm={form} />
+          {entry ? <LinkForm entry={entry} close={close} /> : <p>Loading</p>}
         </ModalBody>
       </ModalPopup>
     </Modal>
