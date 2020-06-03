@@ -15,6 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { proxy } from "../../components/next-tinacms-contentful/next/proxy";
+import { proxy } from "../../next-tinacms-contentful/next/proxy";
 
 export default proxy;

@@ -10,7 +10,7 @@ import BannerText from "../components/blocks/banner/Banner";
 import {
   getCachedFormData,
   setCachedFormData,
-} from "../components/react-tinacms-contentful/cachedFormData";
+} from "../react-tinacms-contentful/src/utils/cachedFormData";
 import Collapsible from "../components/blocks/collapsible/Collapsible";
 import banner from "../components/blocks/banner/BannerBlock";
 import collapsible from "../components/blocks/collapsible/CollapsibleBlock";

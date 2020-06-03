@@ -15,7 +15,7 @@ import { useForm, usePlugin, useCMS } from "tinacms";
 import {
   getCachedFormData,
   setCachedFormData,
-} from "../../components/react-tinacms-contentful/cachedFormData";
+} from "../../react-tinacms-contentful/cachedFormData";
 
 import Box from "@tds/core-box";
 import Button from "@tds/core-button";

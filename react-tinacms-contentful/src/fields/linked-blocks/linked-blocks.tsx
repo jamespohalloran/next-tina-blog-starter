@@ -40,11 +40,11 @@ import {
   useForm,
 } from "tinacms";
 import { FormView } from "@tinacms/react-forms";
-import templates from "../templates/templates";
+import templates from "../../../../components/templates/templates";
 import {
   mapLocalizedValues,
   getLocaleValues,
-} from "../../lib/mapLocalizedValues";
+} from "../../utils/mapLocalizedValues";
 
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import { LinkBlockModal } from "./LinkBlockModal";
