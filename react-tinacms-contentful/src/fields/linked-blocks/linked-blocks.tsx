@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from "react";
 import { Field, Form, FormOptions } from "@tinacms/forms";
 import styled, { css } from "styled-components";
-import { FieldsBuilder } from "@tinacms/form-builder";
 import {
   AddIcon,
   DragIcon,
@@ -49,9 +48,6 @@ import {
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import { LinkBlockModal } from "./LinkBlockModal";
 
-const GroupPanel = styled.div<any>``;
-const PanelHeader = styled.div``;
-const PanelBody = styled.div``;
 const FieldDescription = styled.div``;
 const GroupListHeader = styled.div``;
 const GroupListMeta = styled.div``;
@@ -710,36 +706,6 @@ interface PanelProps {
   label: string;
   template: BlockTemplate;
 }
-
-const Panel = function Panel({
-  setExpanded,
-  isExpanded,
-  tinaForm,
-  field,
-  index,
-  label,
-  template,
-}: PanelProps) {
-  const fields: any[] = React.useMemo(() => {
-    return template.fields.map((subField: any) => ({
-      ...subField,
-      name: `${field.name}.${index}.${subField.name}`,
-    }));
-  }, [field.name, index, template.fields]);
-
-  return (
-    <GroupPanel isExpanded={isExpanded}>
-      <PanelHeader onClick={() => setExpanded(false)}>
-        <LeftArrowIcon />
-        <GroupLabel>{label}</GroupLabel>
-      </PanelHeader>
-      <PanelBody>
-        {/* RENDER OPTIMIZATION: Only render fields of expanded fields.  */}
-        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
-      </PanelBody>
-    </GroupPanel>
-  );
-};
 
 export const BlocksFieldPlugin = {
   name: "linked-blocks",

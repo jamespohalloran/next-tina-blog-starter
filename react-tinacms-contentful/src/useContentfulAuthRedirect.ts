@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { CONTENTFUL_AUTH_TOKEN } from "./utils/contentful-client";
-import Cookies from "js-cookie";
 
 export const useContentfulAuthRedirect = () => {
   useEffect(() => {

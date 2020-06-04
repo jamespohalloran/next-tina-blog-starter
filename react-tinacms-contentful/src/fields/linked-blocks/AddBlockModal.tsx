@@ -17,18 +17,15 @@ limitations under the License.
 */
 
 import * as React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalActions,
   ModalPopup,
 } from "@tinacms/react-modals";
-import { FormBuilder, FieldsBuilder } from "@tinacms/form-builder";
 import { useMemo } from "react";
 import { Form } from "@tinacms/forms";
-import { Button } from "@tinacms/styles";
 import { useCMS } from "@tinacms/react-core";
 import { FormView } from "@tinacms/react-forms";
 
@@ -62,25 +59,3 @@ export const AddBlockModal = ({ plugin, close }: any) => {
     </Modal>
   );
 };
-
-const CreateButton = styled.button`
-  position: relative;
-  text-align: center;
-  font-size: var(--tina-font-size-0);
-  padding: 0 12px;
-  height: 40px;
-  font-weight: 500;
-  width: 100%;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  border: 0;
-  transition: all 85ms ease-out;
-  &:hover {
-    color: var(--tina-color-primary);
-    background-color: #f6f6f9;
-  }
-  &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
-  }
-`;
