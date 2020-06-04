@@ -12,10 +12,7 @@ import markdownToHtml from "../../lib/markdownToHtml";
 import { useState, useEffect } from "react";
 import { useForm, usePlugin, useCMS } from "tinacms";
 
-import {
-  getCachedFormData,
-  setCachedFormData,
-} from "../../react-tinacms-contentful/cachedFormData";
+import { setCachedFormData } from "@tinacms/react-tinacms-contentful";
 
 import Box from "@tds/core-box";
 import Button from "@tds/core-button";

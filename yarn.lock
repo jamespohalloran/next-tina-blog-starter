@@ -1240,6 +1240,16 @@
     "@tinacms/forms" "^0.4.1"
     react-dismissible "^1.1.5"
 
+"@tinacms/react-tinacms-contentful@0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@tinacms/react-tinacms-contentful/-/react-tinacms-contentful-0.1.7.tgz#0b78eff381b77dc40c9dc36fd5592a9a871eb5d0"
+  integrity sha512-2+NYUTeXWZrJAmBcQCgMCcYtRnCLNwTLzEoFHFpPQBdXAnEpwLDqmkJlfoKxrl0tsojSdRLmbdTk0YB/k5cwuQ==
+  dependencies:
+    contentful "^7.14.4"
+    contentful-management "^5.26.3"
+    contentful-resolve-response "^1.1.4"
+    js-cookie "^2.2.1"
+
 "@tinacms/react-toolbar@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@tinacms/react-toolbar/-/react-toolbar-0.1.1.tgz#bf74a2045c4157ecd002eb3d16393dd2d85c1c32"

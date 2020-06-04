@@ -1,11 +1,10 @@
 import "../styles/index.css";
 import { TinaCMS, TinaProvider } from "tinacms";
-import { ContentfulClient } from "../react-tinacms-contentful/src/utils/contentful-client";
-import { TinaContentfulProvider } from "../react-tinacms-contentful/src/TinacmsContentfulProvider";
-import { useContentfulEditing } from "../react-tinacms-contentful/src/useContentfulEditing";
-import { ContentfulLinkedSelectField } from "../react-tinacms-contentful/src/fields/ContentfulLinkedSelectField";
-import { createEnumDeclaration } from "typescript";
-import { BlocksFieldPlugin } from "../react-tinacms-contentful/src/fields/linked-blocks/linked-blocks";
+import { ContentfulClient } from "@tinacms/react-tinacms-contentful";
+import { TinaContentfulProvider } from "@tinacms/react-tinacms-contentful";
+import { useContentfulEditing } from "@tinacms/react-tinacms-contentful";
+import { ContentfulLinkedSelectField } from "@tinacms/react-tinacms-contentful";
+import { BlocksFieldPlugin } from "@tinacms/react-tinacms-contentful";
 function MyApp({ Component, pageProps }) {
   const tinaConfig = {
     apis: {
