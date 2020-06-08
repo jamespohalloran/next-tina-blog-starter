@@ -16,6 +16,7 @@
     "@tds/core-paragraph": "^2.0.12",
     "@tds/core-text": "^3.1.1",
     "@tinacms/react-tinacms-contentful": "0.1.7",
+    "@tinacms/webpack-helpers": "^0.1.0",
     "@types/react-beautiful-dnd": "11.0.5",
     "axios": "^0.19.2",
     "classnames": "2.2.6",

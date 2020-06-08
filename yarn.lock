@@ -1265,6 +1265,11 @@
   resolved "https://registry.yarnpkg.com/@tinacms/styles/-/styles-0.4.2.tgz#59d6cb5ca495db76ea17a409a017175083851e1a"
   integrity sha512-qvasf4g0DCrVGnDqWWb2B5OgWnlhONpJ+NCKgW9zcU3tV1YZ5O7gnIt+THfJ8zh26KyY+sjOC/0KWTHn/hVvng==
 
+"@tinacms/webpack-helpers@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@tinacms/webpack-helpers/-/webpack-helpers-0.1.0.tgz#76afb91d4a4d0b3150a1798a7ed804ddd95be5c3"
+  integrity sha512-QLYyjpq5hgcRQFmSsWCz5sPP56l9T0hK5l4kqkBq+Ii5KljqrkfLPcdz+NmnXDHnrtOX8F3bck88aYD+nHcoFw==
+
 "@types/color-name@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
