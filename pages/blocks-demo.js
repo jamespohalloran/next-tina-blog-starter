@@ -10,6 +10,7 @@ import BannerText from "../components/blocks/banner/Banner";
 import {
   getCachedFormData,
   setCachedFormData,
+  mapLocalizedValues,
 } from "@tinacms/react-tinacms-contentful";
 import Collapsible from "../components/blocks/collapsible/Collapsible";
 import banner from "../components/blocks/banner/BannerBlock";
@@ -21,8 +22,6 @@ const axios = require("axios");
 export default function Post({ page, preview }) {
   const router = useRouter();
   const cms = useCMS();
-
-  const locale = "en-US";
 
   const id = page.sys.id;
   const contentType = page.sys.contentType.sys.id;
@@ -42,33 +41,6 @@ export default function Post({ page, preview }) {
     collapsible,
   };
 
-  const stripLinkedData = (fieldValue) => {
-    if (fieldValue.sys?.contentType.sys.type || "" == "Link") {
-      const { space, contentType, environment, ...sys } = fieldValue.sys;
-      return { sys: { id: sys.id, type: "Link", linkType: "Entry" } };
-    }
-    return fieldValue;
-  };
-
-  const getLocalizedValues = (values) => {
-    const localizedValues = {};
-    Object.keys(values).forEach(function (key, index) {
-      const fieldValue = values[key];
-
-      if (Array.isArray(fieldValue)) {
-        // TODO - this should check on links, not array
-        localizedValues[key] = {
-          [locale]: fieldValue.map((val) => {
-            return stripLinkedData(val);
-          }),
-        };
-      } else {
-        localizedValues[key] = { [locale]: stripLinkedData(fieldValue) };
-      }
-    });
-    return localizedValues;
-  };
-
   const typedFields = (page.fields.typedFields || []).map((block) => {
     return {
       ...block,
@@ -81,7 +53,7 @@ export default function Post({ page, preview }) {
     label: "Blog Post",
     initialValues: { ...page.fields, typedFields },
     onSubmit: async (values) => {
-      const localizedValues = getLocalizedValues(values);
+      const localizedValues = mapLocalizedValues(values, "en-US");
 
       cms.api.contentful
         .save(id, getCachedFormData(id).version, contentType, localizedValues)
@@ -149,22 +121,6 @@ export default function Post({ page, preview }) {
                   </>
                 );
               })}
-
-              {/* {fields.map((field) => (
-                <>
-                  {field._template == "banner" && (
-                    <BannerText
-                      title={field.title}
-                      subtitle={field.subtitle}
-                      buttonText={field.buttonText}
-                      onDownloadClick={() => alert("neat")}
-                    />
-                  )}
-                  {field._template == "collapsible" && (
-                    <Collapsible panels={field.panels} />
-                  )}
-                </>
-              ))} */}
             </article>
           </>
         )}
