@@ -227,6 +227,7 @@ export async function getStaticProps({ params, preview, previewData }) {
   return {
     props: {
       page,
+      preview: !!preview,
     },
   };
 }

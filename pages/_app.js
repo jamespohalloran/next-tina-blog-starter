@@ -38,7 +38,7 @@ function MyApp({ Component, pageProps }) {
         enterEditMode={enterEditMode}
         exitEditMode={exitEditMode}
       >
-        <EditLink editMode={false} />
+        <EditLink editMode={pageProps.preview} />
         <Component {...pageProps} />
       </TinaContentfulProvider>
     </TinaProvider>
@@ -59,6 +59,9 @@ const exitEditMode = () => {
 export const EditLink = ({ editMode }) => {
   const contentful = useContentfulEditing();
 
+  if (editMode) {
+    return null;
+  }
   return (
     <button onClick={contentful.enterEditMode}>
       {editMode ? "Exit Edit Mode" : "Edit This Site"}
