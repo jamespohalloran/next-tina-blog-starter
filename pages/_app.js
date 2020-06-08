@@ -5,6 +5,7 @@ import { TinaContentfulProvider } from "@tinacms/react-tinacms-contentful";
 import { useContentfulEditing } from "@tinacms/react-tinacms-contentful";
 import { ContentfulLinkedSelectField } from "@tinacms/react-tinacms-contentful";
 import { BlocksFieldPlugin } from "@tinacms/react-tinacms-contentful";
+import { useEffect } from "react";
 function MyApp({ Component, pageProps }) {
   const tinaConfig = {
     apis: {
@@ -16,7 +17,7 @@ function MyApp({ Component, pageProps }) {
       }),
     },
     sidebar: {
-      hidden: false,
+      hidden: !pageProps.preview,
       position: "displace",
     },
     // toolbar: {
@@ -30,6 +31,10 @@ function MyApp({ Component, pageProps }) {
     Component: ContentfulLinkedSelectField,
   });
   cms.fields.add(BlocksFieldPlugin);
+
+  useEffect(() => {
+    cms.enable();
+  }, []);
 
   return (
     <TinaProvider cms={cms}>
