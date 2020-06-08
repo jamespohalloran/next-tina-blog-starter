@@ -38,7 +38,7 @@
     "remark-html": "10.0.0",
     "style-loader": "^1.2.1",
     "styled-components": "^5.1.0",
-    "tinacms": "^0.19.1"
+    "tinacms": "0.21.1"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^2.1.0",
