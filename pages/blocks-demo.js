@@ -4,13 +4,11 @@ import Container from "../components/container";
 import Layout from "../components/layout";
 import PostTitle from "../components/post-title";
 import Head from "next/head";
-import { useEffect, useState } from "react";
 import { useForm, usePlugin, useCMS } from "tinacms";
 import BannerText from "../components/blocks/banner/Banner";
 import {
   getCachedFormData,
   setCachedFormData,
-  getLocaleValues,
   mapLocalizedValues,
 } from "@tinacms/react-tinacms-contentful";
 import Collapsible from "../components/blocks/collapsible/Collapsible";
@@ -27,12 +25,6 @@ export default function Post({ page, preview }) {
   const id = page.sys.id;
   const contentType = page.sys.contentType.sys.id;
 
-  useEffect(() => {
-    setCachedFormData(id, {
-      version: page.sys.version,
-    });
-  }, []);
-
   if (!router.isFallback && !page?.fields.slug) {
     return <ErrorPage statusCode={404} />;
   }
@@ -45,11 +37,16 @@ export default function Post({ page, preview }) {
   const loadInitialValues = async () => {
     const entry = await cms.api.contentful.fetchFullEntry(page.sys.id);
 
+    // TODO - we should do this mapping in a Contentful linked-block field
     const typedFields = (entry.fields.typedFields || []).map((block) => {
       return {
         ...block,
         _template: block.sys.contentType.sys.id,
       };
+    });
+
+    setCachedFormData(id, {
+      version: entry.sys.version,
     });
 
     return {
@@ -174,25 +171,6 @@ export async function getStaticProps({ params, preview, previewData }) {
   }
 
   let page = resolvedPages[0];
-
-  if (preview) {
-    const managementPages = (
-      await axios({
-        url:
-          `https://api.contentful.com/spaces/raftynxu3gyd/environments/master/entries?` +
-          `access_token=${previewData.contentful_auth_token}` +
-          `&fields.slug[match]=${slug}` +
-          `&content_type=blocksPage`,
-        method: "GET",
-      })
-    ).data;
-
-    if (managementPages.items.length != 1) {
-      throw new Exception("Unique slug not found");
-    }
-
-    page.sys.version = managementPages.items[0].sys.version;
-  }
 
   return {
     props: {
