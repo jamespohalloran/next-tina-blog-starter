@@ -1229,10 +1229,10 @@
     "@tinacms/forms" "^0.6.0"
     react-dismissible "^1.2.0"
 
-"@tinacms/react-tinacms-contentful@0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@tinacms/react-tinacms-contentful/-/react-tinacms-contentful-0.1.7.tgz#0b78eff381b77dc40c9dc36fd5592a9a871eb5d0"
-  integrity sha512-2+NYUTeXWZrJAmBcQCgMCcYtRnCLNwTLzEoFHFpPQBdXAnEpwLDqmkJlfoKxrl0tsojSdRLmbdTk0YB/k5cwuQ==
+"@tinacms/react-tinacms-contentful@0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@tinacms/react-tinacms-contentful/-/react-tinacms-contentful-0.1.8.tgz#c59bc2daa8df56b56bd665a6c5105893ddf0eca4"
+  integrity sha512-D3HOITVEKagTuIpkdbHg3St49PGEMr2DUzBaXlgSRuPp2oEE42RVYd4V7UcQIX9PfQjF4cmcnv+sOHG1l6yTpQ==
   dependencies:
     contentful "^7.14.4"
     contentful-management "^5.26.3"
