@@ -37,22 +37,11 @@ export default function Post({ page, preview }) {
   const loadInitialValues = async () => {
     const entry = await cms.api.contentful.fetchFullEntry(page.sys.id);
 
-    // TODO - we should do this mapping in a Contentful linked-block field
-    const typedFields = (entry.fields.typedFields || []).map((block) => {
-      return {
-        ...block,
-        _template: block.sys.contentType.sys.id,
-      };
-    });
-
     setCachedFormData(id, {
       version: entry.sys.version,
     });
 
-    return {
-      ...entry.fields,
-      typedFields,
-    };
+    return entry.fields;
   };
 
   const formConfig = {
@@ -90,6 +79,7 @@ export default function Post({ page, preview }) {
         label: "Typed Fields",
         component: "linked-blocks",
         templates: blocks,
+        getTemplateId: (block) => block.sys.contentType.sys.id,
       },
     ],
   };
