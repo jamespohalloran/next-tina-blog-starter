@@ -4,12 +4,13 @@ import Container from "../components/container";
 import Layout from "../components/layout";
 import PostTitle from "../components/post-title";
 import Head from "next/head";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, usePlugin, useCMS } from "tinacms";
 import BannerText from "../components/blocks/banner/Banner";
 import {
   getCachedFormData,
   setCachedFormData,
+  getLocaleValues,
   mapLocalizedValues,
 } from "@tinacms/react-tinacms-contentful";
 import Collapsible from "../components/blocks/collapsible/Collapsible";
@@ -41,17 +42,26 @@ export default function Post({ page, preview }) {
     collapsible,
   };
 
-  const typedFields = (page.fields.typedFields || []).map((block) => {
+  const loadInitialValues = async () => {
+    const entry = await cms.api.contentful.fetchFullEntry(page.sys.id);
+
+    const typedFields = (entry.fields.typedFields || []).map((block) => {
+      return {
+        ...block,
+        _template: block.sys.contentType.sys.id,
+      };
+    });
+
     return {
-      ...block,
-      _template: block.sys.contentType.sys.id,
+      ...entry.fields,
+      typedFields,
     };
-  });
+  };
 
   const formConfig = {
     id: page.fields.slug,
     label: "Blog Post",
-    initialValues: { ...page.fields, typedFields },
+    loadInitialValues,
     onSubmit: async (values) => {
       const localizedValues = mapLocalizedValues(values, "en-US");
 
@@ -90,6 +100,10 @@ export default function Post({ page, preview }) {
   const [pageData, form] = useForm(formConfig);
 
   usePlugin(form);
+
+  if (Object.keys(pageData).length === 0) {
+    return null;
+  }
 
   return (
     <Layout preview={preview}>
